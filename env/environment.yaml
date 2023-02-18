@@ -2,8 +2,10 @@ name: march-madness-2023
 
 channels:
  - defaults
+ - conda-forge
 
 dependencies:
  - python=3.10
  - pandas=1.5.2
+ - kaggle=1.5.12
  - ipykernel
