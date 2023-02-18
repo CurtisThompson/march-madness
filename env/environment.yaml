@@ -1,0 +1,9 @@
+name: march-madness-2023
+
+channels:
+ - defaults
+
+dependencies:
+ - python=3.10
+ - pandas=1.5.2
+ - ipykernel
