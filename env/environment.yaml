@@ -8,4 +8,5 @@ dependencies:
  - python=3.10
  - pandas=1.5.2
  - kaggle=1.5.12
- - ipykernel
+ - xgboost=1.7.1
+ - ipykernel=6.20.2
