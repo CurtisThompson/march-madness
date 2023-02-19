@@ -9,7 +9,7 @@ def prep_submission_frame():
     df_template = pd.read_csv('./data/kaggle/SampleSubmission2023.csv')
 
     # Split ID into values
-    df_template['Year'] = df_template['ID'].apply(lambda x: x.split('_')[0])
+    df_template['Season'] = df_template['ID'].apply(lambda x: x.split('_')[0])
     df_template['TeamA'] = df_template['ID'].apply(lambda x: x.split('_')[1])
     df_template['TeamB'] = df_template['ID'].apply(lambda x: x.split('_')[2])
 
