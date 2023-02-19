@@ -2,18 +2,15 @@ import numpy as np
 import pandas as pd
 
 
-WIN_RATIOS = pd.read_csv('./data/etl/win_ratios.csv')
-
-
-def add_win_ratio(season, teama, teamb):
+def add_win_ratio(season, teama, teamb, win_ratios):
     try:
-        teamawins = WIN_RATIOS.loc[(WIN_RATIOS.Season == season) & (WIN_RATIOS.TeamID == teama)].iloc[0]
+        teamawins = win_ratios.loc[(win_ratios.Season == season) & (win_ratios.TeamID == teama)].iloc[0]
     except:
         teamawins = {'WinRatio':0.5, 'PtsForRatio':0}
         print('Win ratio not found for team ', str(teama))
     
     try:
-        teambwins = WIN_RATIOS.loc[(WIN_RATIOS.Season == season) & (WIN_RATIOS.TeamID == teamb)].iloc[0]
+        teambwins = win_ratios.loc[(win_ratios.Season == season) & (win_ratios.TeamID == teamb)].iloc[0]
     except:
         teambwins = {'WinRatio':0.5, 'PtsForRatio':0}
         print('Win ratio not found for team ', str(teamb))
@@ -51,7 +48,11 @@ def build_training_set():
     df['Win'] = df['WinGap'].apply(lambda x: 1 if x > 0 else 0)
 
     # Add training features
-    df[['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']] = df.apply(lambda x: add_win_ratio(x.Season, x.TeamA, x.TeamB),
+    win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
+    df[['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']] = df.apply(lambda x: add_win_ratio(x.Season,
+                                                                                                      x.TeamA,
+                                                                                                      x.TeamB,
+                                                                                                      win_ratios),
                                                                               axis=1,
                                                                               result_type='expand')
     
@@ -76,9 +77,13 @@ def build_test_set():
     df = prep_submission_frame()
 
     # Add training features
-    #df[['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']] = df.apply(lambda x: add_win_ratio(x.Season, x.TeamA, x.TeamB),
+    #win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
+    #df[['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']] = df.apply(lambda x: add_win_ratio(x.Season,
+    #                                                                                                  x.TeamA,
+    #                                                                                                  x.TeamB,
+    #                                                                                                  win_ratios),
     #                                                                          axis=1,
-    #                                                                          result_type='expand')
+    #                                                                          result_type='expand')                                                                         result_type='expand')
     
     # Save training set
     df.to_csv('./data/etl/test_set.csv', index=False)
