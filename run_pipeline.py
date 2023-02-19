@@ -4,6 +4,7 @@ from src.ingestion.ingestion_kaggle_march_madness import download as download_ka
 from src.ingestion.ingestion_five_three_eight import download as download_538
 
 from src.etl.etl_win_ratios import save_win_ratios
+from src.etl.etl_five_three_eight import find_538_ratings
 from src.etl.add_features import build_training_set, build_test_set
 
 from src.model.evaluate import validate_and_build_model
@@ -24,11 +25,12 @@ if __name__ == "__main__":
             os.makedirs(folder)
 
     # Ingestion
-    download_kaggle()
-    download_538()
+    #download_kaggle()
+    #download_538()
 
     # ETL
     save_win_ratios()
+    find_538_ratings()
 
     # Build Datasets
     build_training_set()

@@ -19,6 +19,17 @@ def add_win_ratio(season, teama, teamb, win_ratios):
     return features
 
 
+def add_538_ratings(df):
+    """Merge 538 ratings into DataFrame."""
+    ratings = pd.read_csv('./data/etl/538_ratings.csv')
+    df = pd.merge(df, ratings, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'Rating':'RatingA'}, axis=1).drop('TeamID', axis=1)
+    df = pd.merge(df, ratings, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'Rating':'RatingB'}, axis=1).drop('TeamID', axis=1)
+    df[['RatingA', 'RatingB']] = df[['RatingA', 'RatingB']].fillna(60)
+    return df
+
+
 def build_training_set():
     # Load mens tourney results
     df_men = pd.read_csv('./data/kaggle/MNCAATourneyCompactResults.csv')
@@ -55,8 +66,12 @@ def build_training_set():
                                                                                                       win_ratios),
                                                                               axis=1,
                                                                               result_type='expand')
+    df = add_538_ratings(df)
+    df['RatingDiff'] = df.RatingA = df.RatingB
     
     # Save training set
+    df = df.sort_values('Season', ignore_index=True)
+    df = df[df.Season >= 2016]
     df.to_csv('./data/etl/training_set.csv', index=False)
 
 

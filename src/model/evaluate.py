@@ -4,7 +4,8 @@ from xgboost import XGBClassifier
 from sklearn.metrics import brier_score_loss, accuracy_score, log_loss, f1_score
 
 
-TRAINING_COLS = ['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']
+#TRAINING_COLS = ['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB', 'RatingA', 'RatingB', 'RatingDiff']
+TRAINING_COLS = ['RatingDiff', 'WinRatioA', 'WinRatioB']
 TARGET_COL = ['Win']
 
 
