@@ -87,7 +87,7 @@ def build_training_set():
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
-    df = df[df.Season >= 2016]
+    df = df[df.Season >= 1985]
     df.to_csv('./data/etl/training_set.csv', index=False)
 
 
