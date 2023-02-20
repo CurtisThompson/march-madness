@@ -23,6 +23,19 @@ def add_538_ratings(df):
     df = pd.merge(df, ratings, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
     df = df.rename({'Rating':'RatingB'}, axis=1).drop('TeamID', axis=1)
     df[['RatingA', 'RatingB']] = df[['RatingA', 'RatingB']].fillna(60)
+    df['RatingDiff'] = df.RatingA - df.RatingB
+    return df
+
+
+def add_seeds(df):
+    """Merge tournament seeds into DataFrame."""
+    seeds = pd.read_csv('./data/etl/seeds.csv')
+    df = pd.merge(df, seeds, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'Seed':'SeedA'}, axis=1).drop('TeamID', axis=1)
+    df = pd.merge(df, seeds, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'Seed':'SeedB'}, axis=1).drop('TeamID', axis=1)
+    df[['SeedA', 'SeedB']] = df[['SeedA', 'SeedB']].fillna(16)
+    df['SeedDiff'] = df.SeedA - df.SeedB
     return df
 
 
@@ -56,8 +69,8 @@ def build_training_set():
 
     # Add training features
     df = add_win_ratio(df)
+    df = add_seeds(df)
     df = add_538_ratings(df)
-    df['RatingDiff'] = df.RatingA - df.RatingB
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
@@ -83,6 +96,7 @@ def build_test_set():
 
     # Add training features
     #df = add_win_ratio(df)
+    #df = add_seeds(df)
     #df = add_538_ratings(df)
     #df['RatingDiff'] = df.RatingA - df.RatingB
 
