@@ -67,7 +67,7 @@ def build_training_set():
                                                                               axis=1,
                                                                               result_type='expand')
     df = add_538_ratings(df)
-    df['RatingDiff'] = df.RatingA = df.RatingB
+    df['RatingDiff'] = df.RatingA - df.RatingB
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
