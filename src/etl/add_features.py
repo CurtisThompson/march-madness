@@ -2,21 +2,17 @@ import numpy as np
 import pandas as pd
 
 
-def add_win_ratio(season, teama, teamb, win_ratios):
-    try:
-        teamawins = win_ratios.loc[(win_ratios.Season == season) & (win_ratios.TeamID == teama)].iloc[0]
-    except:
-        teamawins = {'WinRatio':0.5, 'PtsForRatio':0}
-        print('Win ratio not found for team ', str(teama))
-    
-    try:
-        teambwins = win_ratios.loc[(win_ratios.Season == season) & (win_ratios.TeamID == teamb)].iloc[0]
-    except:
-        teambwins = {'WinRatio':0.5, 'PtsForRatio':0}
-        print('Win ratio not found for team ', str(teamb))
-
-    features = [teamawins['WinRatio'], teamawins['PtsForRatio'], teambwins['WinRatio'], teambwins['PtsForRatio']]
-    return features
+def add_win_ratio(df):
+    """Merge win ratio and pts rato into DataFrame."""
+    win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
+    win_ratios = win_ratios[['Season', 'TeamID', 'WinRatio', 'PtsForRatio']]
+    df = pd.merge(df, win_ratios, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'WinRatio':'WinRatioA', 'PtsForRatio':'PtsForRatioA'}, axis=1).drop('TeamID', axis=1)
+    df = pd.merge(df, win_ratios, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'WinRatio':'WinRatioB', 'PtsForRatio':'PtsForRatioB'}, axis=1).drop('TeamID', axis=1)
+    df[['WinRatioA', 'WinRatioB']] = df[['WinRatioA', 'WinRatioB']].fillna(0)
+    df[['PtsForRatioA', 'PtsForRatioB']] = df[['PtsForRatioA', 'PtsForRatioB']].fillna(0)
+    return df
 
 
 def add_538_ratings(df):
@@ -59,13 +55,7 @@ def build_training_set():
     df['Win'] = df['WinGap'].apply(lambda x: 1 if x > 0 else 0)
 
     # Add training features
-    win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
-    df[['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']] = df.apply(lambda x: add_win_ratio(x.Season,
-                                                                                                      x.TeamA,
-                                                                                                      x.TeamB,
-                                                                                                      win_ratios),
-                                                                              axis=1,
-                                                                              result_type='expand')
+    df = add_win_ratio(df)
     df = add_538_ratings(df)
     df['RatingDiff'] = df.RatingA - df.RatingB
     
@@ -92,14 +82,10 @@ def build_test_set():
     df = prep_submission_frame()
 
     # Add training features
-    #win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
-    #df[['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB']] = df.apply(lambda x: add_win_ratio(x.Season,
-    #                                                                                                  x.TeamA,
-    #                                                                                                  x.TeamB,
-    #                                                                                                  win_ratios),
-    #                                                                          axis=1,
-    #                                                                          result_type='expand')                                                                         result_type='expand')
-    
+    #df = add_win_ratio(df)
+    #df = add_538_ratings(df)
+    #df['RatingDiff'] = df.RatingA - df.RatingB
+
     # Save training set
     df.to_csv('./data/etl/test_set.csv', index=False)
 
