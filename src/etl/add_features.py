@@ -39,6 +39,18 @@ def add_seeds(df):
     return df
 
 
+def add_elo(df):
+    """Merge Elo ratings into DataFrame."""
+    elos = pd.read_csv('./data/etl/elo.csv')
+    df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'Elo':'EloA'}, axis=1).drop('TeamID', axis=1)
+    df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'Elo':'EloB'}, axis=1).drop('TeamID', axis=1)
+    df[['EloA', 'EloB']] = df[['EloA', 'EloB']].fillna(16)
+    df['EloDiff'] = df.EloA - df.EloB
+    return df
+
+
 def build_training_set():
     # Load mens tourney results
     df_men = pd.read_csv('./data/kaggle/MNCAATourneyCompactResults.csv')
@@ -69,6 +81,7 @@ def build_training_set():
 
     # Add training features
     df = add_win_ratio(df)
+    df = add_elo(df)
     df = add_seeds(df)
     df = add_538_ratings(df)
     
@@ -96,6 +109,7 @@ def build_test_set():
 
     # Add training features
     #df = add_win_ratio(df)
+    #df = add_elo(df)
     #df = add_seeds(df)
     #df = add_538_ratings(df)
     #df['RatingDiff'] = df.RatingA - df.RatingB
