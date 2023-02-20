@@ -46,12 +46,14 @@ def add_elo(df):
     df = df.rename({'Elo':'EloA'}, axis=1).drop('TeamID', axis=1)
     df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
     df = df.rename({'Elo':'EloB'}, axis=1).drop('TeamID', axis=1)
-    df[['EloA', 'EloB']] = df[['EloA', 'EloB']].fillna(16)
+    df[['EloA', 'EloB']] = df[['EloA', 'EloB']].fillna(1500)
     df['EloDiff'] = df.EloA - df.EloB
     return df
 
 
 def build_training_set():
+    """Calculate all features for training dataset and save to file."""
+
     # Load mens tourney results
     df_men = pd.read_csv('./data/kaggle/MNCAATourneyCompactResults.csv')
     df_men['WinGap'] = df_men['WScore'] - df_men['LScore']
@@ -104,6 +106,8 @@ def prep_submission_frame():
 
 
 def build_test_set():
+    """Calculate all features for test dataset and save to file."""
+
     # Load template for current season
     df = prep_submission_frame()
 

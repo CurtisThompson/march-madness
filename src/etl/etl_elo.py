@@ -1,6 +1,6 @@
 import pandas as pd
 
-def calculate_elo():
+def calculate_elo(K=32):
     """Calculate season Elo for all teams."""
 
     # Import results data
@@ -41,7 +41,6 @@ def calculate_elo():
             eloB = df_elo.loc[df_elo.TeamID == teamB, 'Elo'].values[0]
 
             # Calc ELO changes
-            K = 32
             rA = 10 ** (eloA / 400)
             rB = 10 ** (eloB / 400)
             eA = rA / (rA + rB)

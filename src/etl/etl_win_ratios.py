@@ -1,6 +1,8 @@
 import pandas as pd
 
 def save_win_ratios():
+    """Calculate season win ratios from compact results."""
+    
     # Get all results into a single dataframe
     df_results = pd.concat([
         pd.read_csv('./data/kaggle/MRegularSeasonCompactResults.csv'),

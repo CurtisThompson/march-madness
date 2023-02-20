@@ -3,6 +3,7 @@ import pandas as pd
 OUTPUT_PATH = './data/five_three_eight_rankings/'
 
 def five_three_eight_api_url(year):
+    """Get URL for 538 yearly ratings."""
     return 'https://projects.fivethirtyeight.com/march-madness-api/' + str(year) + '/fivethirtyeight_ncaa_forecasts.csv'
 
 
