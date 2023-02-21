@@ -6,7 +6,7 @@ from sklearn.metrics import brier_score_loss, accuracy_score, log_loss, f1_score
 
 #TRAINING_COLS = ['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB', 'RatingA', 'RatingB', 'RatingDiff']
 #TRAINING_COLS = ['RatingDiff', 'WinRatioA', 'WinRatioB', 'SeedDiff', 'SeedA', 'SeedB']
-TRAINING_COLS = ['SeedDiff', 'EloDiff']
+TRAINING_COLS = ['SeedDiff', 'EloWinProbA']
 TARGET_COL = ['Win']
 
 

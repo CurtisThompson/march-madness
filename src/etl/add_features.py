@@ -48,6 +48,8 @@ def add_elo(df, K=32):
     df = df.rename({'Elo':'EloB'}, axis=1).drop('TeamID', axis=1)
     df[['EloA', 'EloB']] = df[['EloA', 'EloB']].fillna(1500)
     df['EloDiff'] = df.EloA - df.EloB
+    df['EloWinProbA'] = 1 / (1 + ( 10 ** ((df.EloB-df.EloA) / 400) ))
+    df['EloWinProbB'] = 1 / (1 + ( 10 ** ((df.EloA-df.EloB) / 400) ))
     return df
 
 
