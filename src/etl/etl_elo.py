@@ -63,7 +63,7 @@ def calculate_elo(K=32):
 
     # Save Elos to file
     df_all_elos = pd.concat(df_all_elos, ignore_index=True)
-    df_all_elos.to_csv('./data/etl/elo.csv', index=False)
+    df_all_elos.to_csv(f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv', index=False)
 
 
 if __name__ == "__main__":

@@ -39,9 +39,9 @@ def add_seeds(df):
     return df
 
 
-def add_elo(df):
+def add_elo(df, K=32):
     """Merge Elo ratings into DataFrame."""
-    elos = pd.read_csv('./data/etl/elo.csv')
+    elos = pd.read_csv(f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv')
     df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
     df = df.rename({'Elo':'EloA'}, axis=1).drop('TeamID', axis=1)
     df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
@@ -51,7 +51,7 @@ def add_elo(df):
     return df
 
 
-def build_training_set():
+def build_training_set(elo_K=32):
     """Calculate all features for training dataset and save to file."""
 
     # Load mens tourney results
@@ -83,7 +83,7 @@ def build_training_set():
 
     # Add training features
     df = add_win_ratio(df)
-    df = add_elo(df)
+    df = add_elo(df, K=elo_K)
     df = add_seeds(df)
     df = add_538_ratings(df)
     
@@ -105,7 +105,7 @@ def prep_submission_frame():
     return df_template
 
 
-def build_test_set():
+def build_test_set(elo_K=32):
     """Calculate all features for test dataset and save to file."""
 
     # Load template for current season
@@ -113,7 +113,7 @@ def build_test_set():
 
     # Add training features
     #df = add_win_ratio(df)
-    #df = add_elo(df)
+    #df = add_elo(df, K=elo_K)
     #df = add_seeds(df)
     #df = add_538_ratings(df)
     #df['RatingDiff'] = df.RatingA - df.RatingB

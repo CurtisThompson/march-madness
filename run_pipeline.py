@@ -34,11 +34,11 @@ if __name__ == "__main__":
     save_win_ratios()
     find_538_ratings()
     reformat_seeds()
-    #calculate_elo()
+    #calculate_elo(K=32)
 
     # Build Datasets
-    build_training_set()
-    build_test_set()
+    build_training_set(elo_K=32)
+    build_test_set(elo_K=32)
 
     # Build Models
     validate_and_build_model()
