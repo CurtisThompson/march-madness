@@ -10,3 +10,4 @@ dependencies:
  - kaggle=1.5.12
  - xgboost=1.7.1
  - ipykernel=6.20.2
+ - bayesian-optimization=1.4.2
