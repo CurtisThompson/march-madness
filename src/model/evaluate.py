@@ -112,29 +112,35 @@ def tune_model_bayesian_optimisation(training_data, iterations=5, initial_points
     return best_params
 
 
-def validate_and_build_model(model_name='default_model.mdl', tune=True):
+def validate_and_build_model(model_name='default_model', tune=True):
     """Gets metrics with cross validation, then saves complete model."""
 
     # Load training data
     training_data = load_training_data()
 
-    # Find best hyperparameters by tuning
-    if tune:
-        print()
-        params = tune_model_bayesian_optimisation(training_data, iterations=50, initial_points=10)
-        print()
-        print('Best Hyperparameters')
-        print(params)
-        print()
-    else:
-        params = DEFAULT_PARAMS
+    # Get separate mens and womens data
+    training_data = {'men' : training_data.loc[training_data['Gender'] == 0],
+                     'women' : training_data.loc[training_data['Gender'] == 1]}
 
-    # CV and output metrics
-    cross_validate_model(training_data, params=params)
+    for gen, data in training_data.items():
+        print('Now Building Model For', gen.title())
+        # Find best hyperparameters by tuning
+        if tune:
+            print()
+            params = tune_model_bayesian_optimisation(data, iterations=50, initial_points=10)
+            print()
+            print('Best Hyperparameters')
+            print(params)
+            print()
+        else:
+            params = DEFAULT_PARAMS
 
-    # Build final model and save
-    model = build_model(training_data, params=params)
-    model.save_model(f'./data/models/{model_name}')
+        # CV and output metrics
+        cross_validate_model(data, params=params)
+
+        # Build final model and save
+        model = build_model(data, params=params)
+        model.save_model(f'./data/models/{model_name}_{gen}.mdl')
 
 
 if __name__ == "__main__":
