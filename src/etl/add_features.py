@@ -110,9 +110,9 @@ def prep_submission_frame():
     df_template = pd.read_csv('./data/kaggle/SampleSubmission2023.csv')
 
     # Split ID into values
-    df_template['Season'] = df_template['ID'].apply(lambda x: x.split('_')[0])
-    df_template['TeamA'] = df_template['ID'].apply(lambda x: x.split('_')[1])
-    df_template['TeamB'] = df_template['ID'].apply(lambda x: x.split('_')[2])
+    df_template['Season'] = df_template['ID'].apply(lambda x: x.split('_')[0]).astype(int)
+    df_template['TeamA'] = df_template['ID'].apply(lambda x: x.split('_')[1]).astype(int)
+    df_template['TeamB'] = df_template['ID'].apply(lambda x: x.split('_')[2]).astype(int)
 
     return df_template
 
@@ -122,14 +122,13 @@ def build_test_set(elo_K=32):
 
     # Load template for current season
     df = prep_submission_frame()
-
+    
     # Add training features
-    #df = add_gender(df)
-    #df = add_win_ratio(df)
-    #df = add_elo(df, K=elo_K)
-    #df = add_seeds(df)
-    #df = add_538_ratings(df)
-    #df['RatingDiff'] = df.RatingA - df.RatingB
+    df = add_gender(df)
+    df = add_win_ratio(df)
+    df = add_elo(df, K=elo_K)
+    df = add_seeds(df)
+    df = add_538_ratings(df)
 
     # Save training set
     df.to_csv('./data/etl/test_set.csv', index=False)
