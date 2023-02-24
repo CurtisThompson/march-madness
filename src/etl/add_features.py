@@ -53,6 +53,15 @@ def add_elo(df, K=32):
     return df
 
 
+def add_gender(df):
+    """Merge gender feature with DataFrame."""
+    df_gender = pd.read_csv('./data/etl/genders.csv')
+    df_gender = df_gender.rename(columns={'TeamID' : 'TeamA'})
+    df = pd.merge(df, df_gender, how='left', on='TeamA')
+    df.fillna(0)
+    return df
+
+
 def build_training_set(elo_K=32):
     """Calculate all features for training dataset and save to file."""
 
@@ -84,6 +93,7 @@ def build_training_set(elo_K=32):
     df['Win'] = df['WinGap'].apply(lambda x: 1 if x > 0 else 0)
 
     # Add training features
+    df = add_gender(df)
     df = add_win_ratio(df)
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
@@ -114,6 +124,7 @@ def build_test_set(elo_K=32):
     df = prep_submission_frame()
 
     # Add training features
+    #df = add_gender(df)
     #df = add_win_ratio(df)
     #df = add_elo(df, K=elo_K)
     #df = add_seeds(df)

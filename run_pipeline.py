@@ -8,6 +8,7 @@ from src.etl.etl_five_three_eight import find_538_ratings
 from src.etl.etl_seeds import reformat_seeds
 from src.etl.etl_elo import calculate_elo
 from src.etl.add_features import build_training_set, build_test_set
+from src.etl.etl_gender import find_gender
 
 from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
@@ -31,6 +32,7 @@ if __name__ == "__main__":
     #download_538()
 
     # ETL
+    find_gender()
     save_win_ratios()
     find_538_ratings()
     reformat_seeds()
