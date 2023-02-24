@@ -71,7 +71,7 @@ def build_training_set(elo_K=32):
     df_men = df_men[['Season', 'WTeamID', 'LTeamID', 'WinGap']]
 
     # Load womens tourney results
-    df_women = pd.read_csv('./data/kaggle/MNCAATourneyCompactResults.csv')
+    df_women = pd.read_csv('./data/kaggle/WNCAATourneyCompactResults.csv')
     df_women['WinGap'] = df_women['WScore'] - df_women['LScore']
     df_women = df_women[['Season', 'WTeamID', 'LTeamID', 'WinGap']]
 
