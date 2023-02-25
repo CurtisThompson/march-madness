@@ -62,7 +62,7 @@ def add_gender(df):
     return df
 
 
-def build_training_set(elo_K=32):
+def build_training_set(elo_K=32, start_year=1985):
     """Calculate all features for training dataset and save to file."""
 
     # Load mens tourney results
@@ -101,7 +101,7 @@ def build_training_set(elo_K=32):
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
-    df = df[df.Season >= 1985]
+    df = df[df.Season >= start_year]
     df.to_csv('./data/etl/training_set.csv', index=False)
 
 

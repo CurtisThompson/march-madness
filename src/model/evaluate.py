@@ -17,18 +17,19 @@ def load_training_data():
     return pd.read_csv('./data/etl/training_set.csv')
 
 
-def build_model(training_data, params={}):
+def build_model(training_data, training_columns=TRAINING_COLS, params={}):
     """Fits given data to an XGBoost model."""
     model = XGBClassifier(**params)
 
-    x = training_data[TRAINING_COLS]
+    x = training_data[training_columns]
     y = training_data[TARGET_COL]
     model.fit(x, y)
 
     return model
 
 
-def cross_validate_model(training_data, start_year=2017, end_year=2022, verbose=True, params={}):
+def cross_validate_model(training_data, training_columns=TRAINING_COLS, start_year=2017, end_year=2022,
+                         verbose=True, params={}):
     """Cross validate model by building a new model per year."""
 
     # Store metrics for evaluation
@@ -46,7 +47,7 @@ def cross_validate_model(training_data, start_year=2017, end_year=2022, verbose=
         # If validation set, then get predictions and metrics
         if df_valid.shape[0] > 0:
             # Build model with training set
-            model = build_model(df_train, params=params)
+            model = build_model(df_train, training_columns=training_columns, params=params)
 
             # Get predictions for year
             preds_proba = model.predict_proba(df_valid[TRAINING_COLS])[:,1]
@@ -84,14 +85,16 @@ def cross_validate_model(training_data, start_year=2017, end_year=2022, verbose=
     return avg_acc, avg_brier, avg_logloss, avg_f1
 
 
-def tune_model_bayesian_optimisation(training_data, iterations=5, initial_points=8):
+def tune_model_bayesian_optimisation(training_data, training_columns=TRAINING_COLS, iterations=5, initial_points=8,
+                                     random_state=0):
     """Perform Bayesian Optimisation to find best hyperparameters for model."""
     def bo_tune_function(max_depth, gamma, n_estimators, learning_rate):
         params = {'max_depth' : int(max_depth),
                   'gamma' : gamma,
                   'n_estimators' : int(n_estimators),
                   'learning_rate' : learning_rate}
-        acc, brier, loglogg, f1 = cross_validate_model(training_data, verbose=False, params=params)
+        acc, brier, loglogg, f1 = cross_validate_model(training_data, training_columns=training_columns,
+                                                       verbose=False, params=params)
         return -1*brier
 
     # Search field for bayesian optimisation of hyperparameters
@@ -101,7 +104,7 @@ def tune_model_bayesian_optimisation(training_data, iterations=5, initial_points
                      'learning_rate' : (0,1)}
 
     # Find best hyperparameters
-    xgb_bo = BayesianOptimization(bo_tune_function, search_params, random_state=0)
+    xgb_bo = BayesianOptimization(bo_tune_function, search_params, random_state=random_state)
     xgb_bo.maximize(n_iter=iterations, init_points=initial_points)
     best_params = xgb_bo.max['params']
 
@@ -112,7 +115,9 @@ def tune_model_bayesian_optimisation(training_data, iterations=5, initial_points
     return best_params
 
 
-def validate_and_build_model(model_name='default_model', tune=True):
+def validate_and_build_model(model_name='default_model', training_columns_men=TRAINING_COLS,
+                             training_columns_women=TRAINING_COLS, tune=True, random_state=0,
+                             optimisation_iterations=50, optimisation_initial_points=10):
     """Gets metrics with cross validation, then saves complete model."""
 
     # Load training data
@@ -124,10 +129,15 @@ def validate_and_build_model(model_name='default_model', tune=True):
 
     for gen, data in training_data.items():
         print('Now Building Model For', gen.title())
+
+        # Find training columns
+        training_columns = training_columns_men if gen == 'men' else training_columns_women
+
         # Find best hyperparameters by tuning
         if tune:
             print()
-            params = tune_model_bayesian_optimisation(data, iterations=50, initial_points=10)
+            params = tune_model_bayesian_optimisation(data, training_columns=training_columns, iterations=optimisation_iterations,
+                                                      initial_points=optimisation_initial_points, random_state=random_state)
             print()
             print('Best Hyperparameters')
             print(params)
@@ -136,10 +146,10 @@ def validate_and_build_model(model_name='default_model', tune=True):
             params = DEFAULT_PARAMS
 
         # CV and output metrics
-        cross_validate_model(data, params=params)
+        cross_validate_model(data, training_columns=training_columns, params=params)
 
         # Build final model and save
-        model = build_model(data, params=params)
+        model = build_model(data, training_columns=training_columns, params=params)
         model.save_model(f'./data/models/{model_name}_{gen}.mdl')
 
 

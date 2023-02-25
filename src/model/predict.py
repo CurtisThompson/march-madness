@@ -25,11 +25,11 @@ def predict_row(row):
     return 0.2
 
 
-def predict_frame(df, men_model, women_model, model_columns):
+def predict_frame(df, men_model, women_model, model_columns_men, model_columns_women):
     """Predict the outcome of multiple games."""
     #df['Pred'] = df.apply(predict_row, axis=1)
-    df.loc[df['Gender'] == 0, 'Pred'] = men_model.predict_proba(df.loc[df['Gender'] == 0][model_columns])[:,1]
-    df.loc[df['Gender'] == 1, 'Pred'] = women_model.predict_proba(df.loc[df['Gender'] == 1][model_columns])[:,1]
+    df.loc[df['Gender'] == 0, 'Pred'] = men_model.predict_proba(df.loc[df['Gender'] == 0][model_columns_men])[:,1]
+    df.loc[df['Gender'] == 1, 'Pred'] = women_model.predict_proba(df.loc[df['Gender'] == 1][model_columns_women])[:,1]
     return df
 
 
@@ -39,11 +39,19 @@ def save_predictions(df, file_name="preds", file_path='./data/predictions/'):
     df.to_csv(file_path + file_name + '.csv', index=False)
 
 
-def run(model_columns=MODEL_COLS):
+def run(model_columns=MODEL_COLS, model_columns_men=None, model_columns_women=None):
     """Load in the prediction template, make predictions, and save to file."""
+    
+    # Set model columns
+    model_columns_men = model_columns if model_columns_men == None else model_columns_men
+    model_columns_women = model_columns if model_columns_women == None else model_columns_women
+    
+    # Load data and models
     df = load_submission_frame()
     mmodel, wmodel = load_models()
-    df = predict_frame(df, mmodel, wmodel, model_columns)
+
+    # Create and save predictions
+    df = predict_frame(df, mmodel, wmodel, model_columns_men, model_columns_women)
     save_predictions(df)
 
 

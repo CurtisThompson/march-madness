@@ -29,12 +29,12 @@ if __name__ == "__main__":
 
     # Ingestion
     #download_kaggle()
-    #download_538()
+    #download_538(start_year=2016, end_year=2022)
 
     # ETL
     find_gender()
     save_win_ratios()
-    find_538_ratings()
+    find_538_ratings(start_year=2016, end_year=2022)
     reformat_seeds()
     #calculate_elo(K=32)
 

@@ -3,16 +3,15 @@ import zipfile
 import os
 
 
-def download():
-    """Downloads competition files from March Machine Learning Mania 2023 on Kaggle."""
+def download(comp='march-machine-learning-mania-2023'):
+    """Downloads competition files from Kaggle."""
     d_path = './data/kaggle/'
-    comp = 'march-machine-learning-mania-2023'
 
     # Authenticate through API
     api = KaggleApi()
     api.authenticate()
 
-    # Download march madness 2023 competition files
+    # Download competition files
     api.competition_download_files(comp, path=d_path)
 
     # Unzip competition files
