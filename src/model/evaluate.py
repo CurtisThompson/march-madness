@@ -7,7 +7,7 @@ from bayes_opt import BayesianOptimization
 
 #TRAINING_COLS = ['WinRatioA', 'PtsForRatioA', 'WinRatioB', 'PtsForRatioB', 'RatingA', 'RatingB', 'RatingDiff']
 #TRAINING_COLS = ['RatingDiff', 'WinRatioA', 'WinRatioB', 'SeedDiff', 'SeedA', 'SeedB']
-TRAINING_COLS = ['SeedDiff', 'EloWinProbA', 'Gender']
+TRAINING_COLS = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA', 'ClutchRatioB']
 TARGET_COL = ['Win']
 
 DEFAULT_PARAMS = {'gamma' : 0.499538, 'learning_rate' : 0.104466, 'max_depth' : 2, 'n_estimators' : 113}

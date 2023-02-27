@@ -2,7 +2,7 @@ import pandas as pd
 from xgboost import XGBClassifier
 
 
-MODEL_COLS = ['SeedDiff', 'EloWinProbA', 'Gender']
+MODEL_COLS = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA', 'ClutchRatioB']
 PRED_COLS = ['ID', 'Pred']
 
 
