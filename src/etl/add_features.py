@@ -78,15 +78,15 @@ def build_training_set(elo_K=32, start_year=1985):
     # Concat tourney results
     df = pd.concat([df_men, df_women], ignore_index=True)
 
-    # Flip random rows so that winner isn't always first team
-    num_rows = df.shape[0]
-    np.random.seed(0)
-    index_rand = [True if x == 1 else False for x in np.random.randint(0, 2, num_rows)]
+    # Duplicate rows by swapping winning and losing teams
+    df_flipped = df.copy()
+    df_flipped['WinGap'] = 0 - df_flipped['WinGap']
+    df_flipped = df_flipped.rename(columns={'WTeamID':'LTeamID', 'LTeamID':'WTeamID'})
+    df = pd.concat([df, df_flipped], ignore_index=True)
+
+    # Change column names
     df['TeamA'] = df['WTeamID']
     df['TeamB'] = df['LTeamID']
-    df.loc[index_rand, 'TeamA'] = df.loc[index_rand, 'LTeamID']
-    df.loc[index_rand, 'TeamB'] = df.loc[index_rand, 'WTeamID']
-    df.loc[index_rand, 'WinGap'] = 0 - df.loc[index_rand, 'WinGap']
     df = df[['Season', 'TeamA', 'TeamB', 'WinGap']]
     
     # Add binary win feature
