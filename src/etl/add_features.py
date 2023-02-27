@@ -62,6 +62,17 @@ def add_gender(df):
     return df
 
 
+def add_clutch(df):
+    """Merge clutch game features with DataFrame."""
+    df_clutch = pd.read_csv('./data/etl/clutch_games.csv')
+    df = pd.merge(df, df_clutch, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'ClutchRatio':'ClutchRatioA'}, axis=1).drop(['TeamID', 'ClutchWins', 'ClutchLosses'], axis=1)
+    df = pd.merge(df, df_clutch, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'ClutchRatio':'ClutchRatioB'}, axis=1).drop(['TeamID', 'ClutchWins', 'ClutchLosses'], axis=1)
+    df[['ClutchRatioA', 'ClutchRatioB']] = df[['ClutchRatioA', 'ClutchRatioB']].fillna(0.5)
+    return df
+
+
 def build_training_set(elo_K=32, start_year=1985):
     """Calculate all features for training dataset and save to file."""
 
@@ -98,6 +109,7 @@ def build_training_set(elo_K=32, start_year=1985):
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
     df = add_538_ratings(df)
+    df = add_clutch(df)
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
@@ -129,6 +141,7 @@ def build_test_set(elo_K=32):
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
     df = add_538_ratings(df)
+    df = add_clutch(df)
 
     # Save training set
     df.to_csv('./data/etl/test_set.csv', index=False)
