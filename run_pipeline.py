@@ -24,7 +24,9 @@ if __name__ == "__main__":
         './data/five_three_eight_rankings/',
         './data/kaggle/',
         './data/models/',
-        './data/predictions/'
+        './data/predictions/',
+        './data/explain/'
+        './viz/visuals/',
     ]
     for folder in folders:
         if not os.path.exists(folder):

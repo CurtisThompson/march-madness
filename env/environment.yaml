@@ -1,8 +1,8 @@
 name: march-madness-2023
 
 channels:
- - defaults
  - conda-forge
+ - defaults
 
 dependencies:
  - python=3.10
@@ -11,3 +11,5 @@ dependencies:
  - xgboost=1.7.1
  - ipykernel=6.20.2
  - bayesian-optimization=1.4.2
+ - matplotlib=3.7.0
+ - shap=0.41.0
