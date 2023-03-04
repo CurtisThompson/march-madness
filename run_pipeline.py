@@ -14,6 +14,8 @@ from src.etl.etl_clutch_games import calculate_clutch_win_ratio
 from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
 
+from src.submission.kaggle_submission import submit as competition_submit
+
 
 if __name__ == "__main__":
     # Build data directory structure
@@ -49,3 +51,6 @@ if __name__ == "__main__":
 
     # Predictions
     predict_current_year()
+
+    # Submit Predictions To Competition
+    #competition_submit(message='Test API Submission')

@@ -39,7 +39,8 @@ def save_predictions(df, file_name="preds", file_path='./data/predictions/'):
     df.to_csv(file_path + file_name + '.csv', index=False)
 
 
-def run(model_columns=MODEL_COLS, model_columns_men=None, model_columns_women=None):
+def run(model_columns=MODEL_COLS, model_columns_men=None, model_columns_women=None, file_name="preds",
+        file_path='./data/predictions/'):
     """Load in the prediction template, make predictions, and save to file."""
     
     # Set model columns
@@ -52,7 +53,7 @@ def run(model_columns=MODEL_COLS, model_columns_men=None, model_columns_women=No
 
     # Create and save predictions
     df = predict_frame(df, mmodel, wmodel, model_columns_men, model_columns_women)
-    save_predictions(df)
+    save_predictions(df, file_name=file_name, file_path=file_path)
 
 
 if __name__ == "__main__":
