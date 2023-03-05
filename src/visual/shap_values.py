@@ -1,25 +1,18 @@
-# Scott Lundberg examples
-# https://towardsdatascience.com/interpretable-machine-learning-with-xgboost-9ec80d148d27
-
-# SHAP GitHub
-# https://github.com/slundberg/shap
-
-# Microsoft Responsible AI Standard
-# https://blogs.microsoft.com/wp-content/uploads/prod/sites/5/2022/06/Microsoft-Responsible-AI-Standard-v2-General-Requirements-3.pdf
-
 import shap
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 from xgboost import XGBClassifier
 
 
 MODEL_COLS = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA', 'ClutchRatioB']
 
 
-def load_features():
+def load_features(name='test_set', path='./data/etl/'):
     """Load in calculated features."""
-    return pd.read_csv('./data/etl/test_set.csv')
+    path = os.path.join(path, name + '.csv')
+    return pd.read_csv(path)
 
 
 def load_models(name='default_model'):
@@ -31,14 +24,16 @@ def load_models(name='default_model'):
     return men_model, women_model
 
 
-def load_predictions(name='preds'):
+def load_predictions(name='preds', path='./data/predictions/'):
     """Load model predictions."""
-    return pd.read_csv(f'./data/predictions/{name}.csv')
+    path = os.path.join(path, name + '.csv')
+    return pd.read_csv(path)
 
 
-def load_training_data():
+def load_training_data(name='training_set', path='./data/etl/'):
     """Load data used to train models."""
-    df = pd.read_csv('./data/etl/training_set.csv')
+    path = os.path.join(path, name + '.csv')
+    df = pd.read_csv(path)
     df_women = df.loc[df.Gender == 1]
     df_men = df.loc[df.Gender == 0]
     return df_men, df_women
@@ -80,6 +75,8 @@ def force_plot(shapset, columns):
 
 
 def build_shap_sets(mens_columns=MODEL_COLS, womens_columns=MODEL_COLS, model_names='default_model'):
+    """Build a combined dataset of feature values and shap values from the test set."""
+
     # Get data
     df = load_features()
     df = df.drop('Pred', axis=1)
@@ -126,15 +123,25 @@ def load_shap_set():
     return df_men, df_women
 
 
-if __name__ == "__main__":
-    is_load_shap_set = False
+def build_and_plot(is_load_shap_set=False, mens_columns=MODEL_COLS, womens_columns=MODEL_COLS):
+    """Build or load the shap dataset, and then create force plots for rows."""
 
+    # Load existing shap set or build it
     if is_load_shap_set:
         df_men, df_women = load_shap_set()
     else:
-        df_men, df_women = build_shap_sets()
+        df_men, df_women = build_shap_sets(mens_columns=mens_columns, womens_columns=womens_columns)
         save_shap_set(df_men, df_women)
-    
+
+    # Create plots
     for i in range(3):
         force_plot(df_men.iloc[i], MODEL_COLS)
         force_plot(df_women.iloc[i], MODEL_COLS)
+
+
+if __name__ == "__main__":
+    build_and_plot()
+
+    
+    
+    
