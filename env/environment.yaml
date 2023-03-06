@@ -13,3 +13,4 @@ dependencies:
  - bayesian-optimization=1.4.2
  - matplotlib=3.7.0
  - shap=0.41.0
+ - dash=2.8.1
