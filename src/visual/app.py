@@ -13,10 +13,13 @@ from dash.dependencies import Input, Output
 # Datasets
 data_shap_men = pd.read_csv('./data/explain/shap_men.csv')
 data_shap_women = pd.read_csv('./data/explain/shap_women.csv')
+data_preds = pd.read_csv('./data/predictions/preds.csv')
 mens_teams = pd.read_csv('./data/kaggle/MTeams.csv').rename(columns={'TeamID':'value', 'TeamName':'label'})
 mens_teams = mens_teams[['label', 'value']].to_dict(orient='records')
+mens_id_name_dict = dict([(x['value'], x['label']) for x in mens_teams])
 womens_teams = pd.read_csv('./data/kaggle/WTeams.csv').rename(columns={'TeamID':'value', 'TeamName':'label'})
 womens_teams = womens_teams[['label', 'value']].to_dict(orient='records')
+womens_id_name_dict = dict([(x['value'], x['label']) for x in womens_teams])
 
 
 # Main app
@@ -67,6 +70,20 @@ app.layout = html.Div(
         html.Div(
             className='app-body',
             children=[
+                html.Div(
+                    className='team-name',
+                    children=[
+                        html.P(className='team-full-name', children="Team A", id='team-a-full-name'),
+                        html.P(className='team-win-prob', children="50%", id='team-a-win-prob')
+                    ]
+                ),
+                html.Div(
+                    className='team-name',
+                    children=[
+                        html.P(className='team-full-name', children="Team B", id='team-b-full-name'),
+                        html.P(className='team-win-prob', children="50%", id='team-b-win-prob')
+                    ]
+                ),
                 html.H2(children="Predictor Factors"),
                 html.Img(id="shap-game-prediction", className='shap-image')
             ]
@@ -79,6 +96,49 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
+@app.callback(
+        [Output('team-a-full-name', 'children'), Output('team-a-win-prob', 'children'),
+         Output('team-b-full-name', 'children'), Output('team-b-win-prob', 'children')],
+        [Input('competition-gender', 'value'), Input('home_team', 'value'), Input('away_team', 'value')]
+)
+def update_team_win_probs(gender, teama, teamb):
+    def fancy_win_prob(num):
+        str1 = str(round(num, 3) * 100)
+        str_parts = str1.split('.')
+        str_final = str_parts[0]
+        if len(str_parts) > 1 and str_parts[1][0] != '0':
+            str_final += '.' + str_parts[1][0]
+        return str_final + '%'
+    
+    # If no team selected, do not update images
+    if gender == None or teama == None or teamb == None:
+        return no_update
+
+    # Get teams in ID order, and construct ID
+    year = 2023
+    home_team = min(teama, teamb)
+    away_team = max(teama, teamb)
+    match_id = str(year) + '_' + str(home_team) + '_' + str(away_team)
+
+    # If not a row in shap dataset then do not update graph
+    if match_id not in data_preds.ID.values:
+        return no_update
+
+    # Find match predictions in shap dataset
+    result = data_preds.loc[data_preds.ID == match_id].reset_index(drop=True).iloc[0]
+
+    # Calculate win probs
+    home_win_prob = fancy_win_prob(result['Pred'])
+    away_win_prob = fancy_win_prob(1-result['Pred'])
+
+    # Get team names
+    name_dict = mens_id_name_dict if gender == 0 else womens_id_name_dict
+    home_name = name_dict[home_team]
+    away_name = name_dict[away_team]
+
+    return home_name, home_win_prob, away_name, away_win_prob
 
 
 @app.callback(
