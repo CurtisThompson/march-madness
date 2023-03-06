@@ -15,6 +15,8 @@ data_shap_men = pd.read_csv('./data/explain/shap_men.csv')
 data_shap_women = pd.read_csv('./data/explain/shap_women.csv')
 mens_teams = pd.read_csv('./data/kaggle/MTeams.csv').rename(columns={'TeamID':'value', 'TeamName':'label'})
 mens_teams = mens_teams[['label', 'value']].to_dict(orient='records')
+womens_teams = pd.read_csv('./data/kaggle/WTeams.csv').rename(columns={'TeamID':'value', 'TeamName':'label'})
+womens_teams = womens_teams[['label', 'value']].to_dict(orient='records')
 
 
 # Main app
@@ -36,6 +38,14 @@ app.layout = html.Div(
         html.Div(
             className='app-settings',
             children=[
+                html.Div(children=[
+                    html.Label(children="Competition"),
+                    dcc.Dropdown(
+                        id='competition-gender',
+                        options=[{'label': "Men's", 'value':0}, {'label': "Women's", 'value':1}],
+                        value=0
+                    )
+                ], className="app-single-setting-container"),
                 html.Div(children=[
                     html.Label(children="Team"),
                     dcc.Dropdown(
@@ -72,12 +82,24 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output('shap-game-prediction', 'src'),
-    [Input('home_team', 'value'), Input('away_team', 'value')]
+        [Output('home_team', 'options'), Output('home_team', 'value'),
+         Output('away_team', 'options'), Output('away_team', 'value')],
+        [Input('competition-gender', 'value')]
 )
-def update_figure(teama, teamb):
+def update_dashboard_gender(gender):
+    if gender == 1:
+        return womens_teams, 3247, womens_teams, 3348
+    else:
+        return mens_teams, 1173, mens_teams, 1187
+
+
+@app.callback(
+    Output('shap-game-prediction', 'src'),
+    [Input('competition-gender', 'value'), Input('home_team', 'value'), Input('away_team', 'value')]
+)
+def update_figure(gender, teama, teamb):
     # If no team selected, do not update images
-    if teama == None or teamb == None:
+    if gender == None or teama == None or teamb == None:
         return no_update
 
     # Get teams in ID order, and construct ID
@@ -87,11 +109,12 @@ def update_figure(teama, teamb):
     match_id = str(year) + '_' + str(home_team) + '_' + str(away_team)
 
     # If not a row in shap dataset then do not update graph
-    if match_id not in data_shap_men.ID.values:
+    data_shap = data_shap_men if gender == 0 else data_shap_women
+    if match_id not in data_shap.ID.values:
         return no_update
 
     # Find match predictions in shap dataset
-    shapset = data_shap_men.loc[data_shap_men.ID == match_id].reset_index(drop=True).iloc[0]
+    shapset = data_shap.loc[data_shap.ID == match_id].reset_index(drop=True).iloc[0]
 
     # Create plot and save to memory
     data = create_force_plot(shapset)
