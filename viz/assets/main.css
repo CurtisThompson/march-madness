@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    color: #111111;
+    font-family: "Lato", sans-serif;
+    font-size: 16px;
+}
+
+.app-header, .app-settings, .app-body, .app-footer {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.app-header {
+    background: #111111;
+    color: #f9f9f9;
+    text-align: center;
+}
+
+.app-header h1 {
+    margin: 0;
+    padding: 10px 20px;
+    font-size: 40px;
+}
+
+.app-header p {
+    padding-bottom: 1em;
+}
+
+.app-settings, .app-body {
+    background: white;
+    border-bottom: 1px solid #cccccc;
+}
+
+.app-settings .app-single-setting-container {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 3em;
+    padding-bottom: 1em;
+    width: 25%;
+    min-width: 200px;
+}
+
+.app-settings label {
+    font-weight: 700;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.app-settings .dash-dropdown {
+    width: 50%;
+    min-width: 150px;
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0.5em 2em;
+}
+
+.app-body {
+    padding: 2em 0;
+}
+
+.app-body h2 {
+    text-align: center;
+    padding-bottom: 1.5em;
+}
+
+img {
+    max-width: 100%;
+}
+
+.app-footer {
+    background: white;
+    color: #cccccc;
+    font-size: 0.75em;
+    text-align: center;
+    padding: 1.25em 0 0 0;
+}

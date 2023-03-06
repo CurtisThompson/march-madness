@@ -1,5 +1,6 @@
 import io
 import base64
+import os
 
 import numpy as np
 import pandas as pd
@@ -14,25 +15,55 @@ data_shap_women = pd.read_csv('./data/explain/shap_women.csv')
 
 
 # Main app
-app = Dash(__name__)
+assets_path = os.getcwd() + '/viz/assets'
+print(assets_path)
+app = Dash(__name__, assets_folder=assets_path)
 
 
 # App layout
 app.layout = html.Div(
     children=[
-        html.H1(children="March Madness Prediction Explorer"),
-        html.P(children="Look at match predictions for each game of March Madness."),
-        dcc.Dropdown(
-            id='home_team',
-            options=[{'label': '1173', 'value': 1173}, {'label': '1127', 'value': 1127}],
-            value=1173
+        html.Div(
+            className='app-header',
+            children=[
+                html.H1(children="March Madness Prediction Explorer"),
+                html.P(children="Look at match predictions for each game of March Madness."),
+            ]
         ),
-        dcc.Dropdown(
-            id='away_team',
-            options=[{'label': '1187', 'value': 1187}, {'label': '1416', 'value': 1416}],
-            value=1187
+        html.Div(
+            className='app-settings',
+            children=[
+                html.Div(children=[
+                    html.Label(children="Team"),
+                    dcc.Dropdown(
+                        id='home_team',
+                        options=[{'label': '1173', 'value': 1173}, {'label': '1127', 'value': 1127}],
+                        value=1173
+                    )
+                ], className="app-single-setting-container"),
+                html.Div(children=[
+                    html.Label(children="Team"),
+                    dcc.Dropdown(
+                        id='away_team',
+                        options=[{'label': '1187', 'value': 1187}, {'label': '1416', 'value': 1416}],
+                        value=1187
+                    ),
+                ], className="app-single-setting-container")
+            ]
         ),
-        html.Img(id="shap-game-prediction")
+        html.Div(
+            className='app-body',
+            children=[
+                html.H2(children="Predictor Factors"),
+                html.Img(id="shap-game-prediction", className='shap-image')
+            ]
+        ),
+        html.Div(
+            className='app-footer',
+            children=[
+                html.P(children="Curtis Thompson | https://github.com/CurtisThompson/march-madness")
+            ]
+        ),
     ]
 )
 
