@@ -9,9 +9,12 @@ import shap
 from dash import Dash, dcc, html, no_update
 from dash.dependencies import Input, Output
 
+
 # Datasets
 data_shap_men = pd.read_csv('./data/explain/shap_men.csv')
 data_shap_women = pd.read_csv('./data/explain/shap_women.csv')
+mens_teams = pd.read_csv('./data/kaggle/MTeams.csv').rename(columns={'TeamID':'value', 'TeamName':'label'})
+mens_teams = mens_teams[['label', 'value']].to_dict(orient='records')
 
 
 # Main app
@@ -37,7 +40,7 @@ app.layout = html.Div(
                     html.Label(children="Team"),
                     dcc.Dropdown(
                         id='home_team',
-                        options=[{'label': '1173', 'value': 1173}, {'label': '1127', 'value': 1127}],
+                        options=mens_teams,
                         value=1173
                     )
                 ], className="app-single-setting-container"),
@@ -45,7 +48,7 @@ app.layout = html.Div(
                     html.Label(children="Team"),
                     dcc.Dropdown(
                         id='away_team',
-                        options=[{'label': '1187', 'value': 1187}, {'label': '1416', 'value': 1416}],
+                        options=mens_teams,
                         value=1187
                     ),
                 ], className="app-single-setting-container")
@@ -73,19 +76,19 @@ app.layout = html.Div(
     [Input('home_team', 'value'), Input('away_team', 'value')]
 )
 def update_figure(teama, teamb):
+    # If no team selected, do not update images
+    if teama == None or teamb == None:
+        return no_update
+
     # Get teams in ID order, and construct ID
     year = 2023
     home_team = min(teama, teamb)
     away_team = max(teama, teamb)
     match_id = str(year) + '_' + str(home_team) + '_' + str(away_team)
-    print(match_id)
 
     # If not a row in shap dataset then do not update graph
     if match_id not in data_shap_men.ID.values:
-        print('no update')
         return no_update
-
-    print('will update')
 
     # Find match predictions in shap dataset
     shapset = data_shap_men.loc[data_shap_men.ID == match_id].reset_index(drop=True).iloc[0]
