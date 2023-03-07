@@ -93,3 +93,39 @@ def get_match_win_probs(df_prob, match_id):
     away_win_prob = fancy_win_prob(1-result['Pred'])
 
     return home_win_prob, away_win_prob
+
+
+def get_teams_win_loss(year):
+    """Returns a DataFrame with win and loss count for each team in given season."""
+    df = pd.read_csv('./data/etl/win_ratios.csv')
+    df = df.loc[df.Season == year, ['TeamID', 'Wins', 'Losses']]
+    return df
+
+
+def get_teams_form():
+    """Returns a DataFrame of the results of the last 5 games for each team."""
+
+    # Get all results
+    dfm = pd.read_csv('./data/kaggle/MRegularSeasonCompactResults.csv')
+    dfw = pd.read_csv('./data/kaggle/WRegularSeasonCompactResults.csv')
+    df = pd.concat([dfm, dfw])[['Season', 'DayNum', 'WTeamID', 'LTeamID']]
+    df['Result'] = 'W'
+
+    # Get inverse results (include losing team first)
+    df2 = df.copy()
+    df2[['WTeamID', 'LTeamID']] = df[['LTeamID', 'WTeamID']]
+    df2['Result'] = 'L'
+    df = pd.concat([df, df2], ignore_index=True).sort_values(['Season', 'DayNum']).reset_index(drop=True)
+
+    # Make form DataFrame
+    df_form = pd.DataFrame(df.WTeamID.unique(), columns=['Team'])
+    df = df.groupby('WTeamID')
+    df_form['G1'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-1].Result)
+    df_form['G2'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-2].Result)
+    df_form['G3'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-3].Result)
+    df_form['G4'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-4].Result)
+    df_form['G5'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-5].Result)
+    return df_form
+
+if __name__ == "__main__":
+    print(get_teams_form())

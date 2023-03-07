@@ -13,6 +13,8 @@ mens_teams = app_utils.get_teams_list(False)
 mens_id_name_dict = app_utils.get_teams_dict(mens_teams)
 womens_teams = app_utils.get_teams_list(True)
 womens_id_name_dict = app_utils.get_teams_dict(womens_teams)
+team_forms = app_utils.get_teams_form()
+team_win_records = app_utils.get_teams_win_loss(2023)
 
 
 # Main app
