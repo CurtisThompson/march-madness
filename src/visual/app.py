@@ -18,6 +18,7 @@ womens_id_name_dict = app_utils.get_teams_dict(womens_teams)
 # Main app
 assets_path = os.getcwd() + '/viz/assets'
 app = Dash(__name__, assets_folder=assets_path)
+app.title = 'March Madness Prediction Explorer'
 
 
 # App layout
