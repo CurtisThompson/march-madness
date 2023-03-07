@@ -68,6 +68,7 @@ app.layout = html.Div(
                 html.Div(
                     className='team-name',
                     children=[
+                        html.P(className='team-win-ratio', children="0-0", id='team-a-win-ratio'),
                         html.P(className='team-full-name', children="Team A", id='team-a-full-name'),
                         html.P(className='team-win-prob', children="50%", id='team-a-win-prob')
                     ]
@@ -75,6 +76,7 @@ app.layout = html.Div(
                 html.Div(
                     className='team-name',
                     children=[
+                        html.P(className='team-win-ratio', children="0-0", id='team-b-win-ratio'),
                         html.P(className='team-full-name', children="Team B", id='team-b-full-name'),
                         html.P(className='team-win-prob', children="50%", id='team-b-win-prob')
                     ]
@@ -95,7 +97,8 @@ app.layout = html.Div(
 
 @app.callback(
         [Output('team-a-full-name', 'children'), Output('team-a-win-prob', 'children'),
-         Output('team-b-full-name', 'children'), Output('team-b-win-prob', 'children')],
+         Output('team-b-full-name', 'children'), Output('team-b-win-prob', 'children'),
+         Output('team-a-win-ratio', 'children'), Output('team-b-win-ratio', 'children')],
         [Input('competition-gender', 'value'), Input('home_team', 'value'), Input('away_team', 'value')]
 )
 def update_team_win_probs(gender, teama, teamb):
@@ -120,7 +123,11 @@ def update_team_win_probs(gender, teama, teamb):
     home_name = name_dict[home_team]
     away_name = name_dict[away_team]
 
-    return home_name, home_win_prob, away_name, away_win_prob
+    # Get team win ratios
+    home_win_ratio = app_utils.get_team_win_record(home_team, team_win_records)
+    away_win_ratio = app_utils.get_team_win_record(away_team, team_win_records)
+
+    return home_name, home_win_prob, away_name, away_win_prob, home_win_ratio, away_win_ratio
 
 
 @app.callback(

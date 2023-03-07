@@ -127,5 +127,10 @@ def get_teams_form():
     df_form['G5'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-5].Result)
     return df_form
 
-if __name__ == "__main__":
-    print(get_teams_form())
+
+def get_team_win_record(team, df):
+    """Get a string version of a team win record."""
+    row = df.loc[df.TeamID == team].reset_index(drop=True).iloc[0]
+    wins = row['Wins']
+    losses = row['Losses']
+    return f'{wins} - {losses}'

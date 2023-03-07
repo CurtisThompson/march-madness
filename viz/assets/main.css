@@ -84,6 +84,11 @@ body {
     margin: 0.5em;
 }
 
+.app-body .team-win-ratio {
+    font-size: 1em;
+    color: #aaaaaa;
+}
+
 img {
     max-width: 100%;
 }
