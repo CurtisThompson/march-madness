@@ -104,6 +104,28 @@ body {
     background-color: indianred;
 }
 
+.app-body #main-stats-table {
+    width: 50%;
+    min-width: 300px;
+    max-width: 600px;
+    margin: 0 auto 2em;
+    text-align: center;
+}
+
+.app-body #main-stats-table th {
+    font-weight: 700;
+    text-align: center;
+    width: 33%;
+    background-color: #eeeeee;
+    font-family: "Lato", sans-serif;
+}
+
+.app-body #main-stats-table td {
+    text-align: center;
+    width: 33%;
+    font-family: "Lato", sans-serif;
+}
+
 img {
     max-width: 100%;
 }

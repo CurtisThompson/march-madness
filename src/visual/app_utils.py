@@ -134,3 +134,30 @@ def get_team_win_record(team, df):
     wins = row['Wins']
     losses = row['Losses']
     return f'{wins} - {losses}'
+
+
+def load_test_set():
+    """Load test set."""
+    return pd.read_csv('./data/etl/test_set.csv')
+
+
+def get_feature_table(test_set, features, match_id):
+    """Get table of features for match."""
+    
+    # Get match features
+    row = test_set.loc[test_set.ID == match_id].reset_index(drop=True).iloc[0]
+
+    # Find feature values
+    features_a = row[[x+'A' for x in features]].values
+    features_b = row[[x+'B' for x in features]].values
+    df = pd.DataFrame([features_a, features, features_b]).transpose().rename(columns={0:'TeamA', 1:'Statistics', 2:'TeamB'})
+
+    # Change types
+    for index, row in df.iterrows():
+        for col in df:
+            if (type(df.loc[index, col]) == np.float64):
+                if (df.loc[index, col] <= 1):
+                    df.loc[index, col] = fancy_win_prob(df.loc[index, col])
+                else:
+                    df.loc[index, col] = str(int(df.loc[index, col]))
+    return df

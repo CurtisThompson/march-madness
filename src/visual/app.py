@@ -1,6 +1,6 @@
 import os
 
-from dash import Dash, dcc, html, no_update
+from dash import Dash, dcc, html, no_update, dash_table
 from dash.dependencies import Input, Output
 
 import app_utils
@@ -15,6 +15,7 @@ womens_teams = app_utils.get_teams_list(True)
 womens_id_name_dict = app_utils.get_teams_dict(womens_teams)
 team_forms = app_utils.get_teams_form()
 team_win_records = app_utils.get_teams_win_loss(2023)
+test_set = app_utils.load_test_set()
 
 
 # Main app
@@ -101,6 +102,7 @@ app.layout = html.Div(
                         html.P(className='team-win-prob', children="50%", id='team-b-win-prob')
                     ]
                 ),
+                dash_table.DataTable(id='main-stats-table', data=[]),
                 html.H2(children="Predictor Factors"),
                 html.Img(id="shap-game-prediction", className='shap-image')
             ]
@@ -113,6 +115,40 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
+@app.callback(
+        [Output('main-stats-table', 'data'), Output('main-stats-table', 'columns')],
+        [Input('competition-gender', 'value'), Input('home_team', 'value'), Input('away_team', 'value')]
+)
+def update_main_stats_table(gender, teama, teamb):
+    """Callback to update match features table."""
+
+    if app_utils.cannot_update_visuals(gender, teama, teamb):
+        return no_update
+
+    # Get teams in ID order, and construct ID
+    year = 2023
+    match_id, home_team, away_team = app_utils.get_match_id(year, teama, teamb)
+
+    # Get team names
+    name_dict = mens_id_name_dict if gender == 0 else womens_id_name_dict
+    home_name = name_dict[home_team]
+    away_name = name_dict[away_team]
+
+    # If not a row in shap dataset then do not update graph
+    if match_id not in test_set.ID.values:
+        return no_update
+    
+    df = app_utils.get_feature_table(test_set,
+                                     ['Seed', 'Elo', 'WinRatio'],
+                                     match_id).to_dict('records')
+
+    columns = [{'id': 'TeamA', 'name': home_name},
+               {'id': 'Statistics', 'name': 'Statistics'},
+               {'id': 'TeamB', 'name': away_name}]
+
+    return df, columns
 
 
 @app.callback(
