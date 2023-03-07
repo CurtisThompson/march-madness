@@ -70,6 +70,16 @@ app.layout = html.Div(
                     children=[
                         html.P(className='team-win-ratio', children="0-0", id='team-a-win-ratio'),
                         html.P(className='team-full-name', children="Team A", id='team-a-full-name'),
+                        html.Div(
+                            className='team-form-container',
+                            children=[
+                                html.Span(className='team-form-win', id='team-a-form-1'),
+                                html.Span(className='team-form-loss', id='team-a-form-2'),
+                                html.Span(className='team-form-win', id='team-a-form-3'),
+                                html.Span(className='team-form-win', id='team-a-form-4'),
+                                html.Span(className='team-form-win', id='team-a-form-5')
+                            ]
+                        ),
                         html.P(className='team-win-prob', children="50%", id='team-a-win-prob')
                     ]
                 ),
@@ -78,6 +88,16 @@ app.layout = html.Div(
                     children=[
                         html.P(className='team-win-ratio', children="0-0", id='team-b-win-ratio'),
                         html.P(className='team-full-name', children="Team B", id='team-b-full-name'),
+                        html.Div(
+                            className='team-form-container',
+                            children=[
+                                html.Span(className='team-form-win', id='team-b-form-1'),
+                                html.Span(className='team-form-loss', id='team-b-form-2'),
+                                html.Span(className='team-form-loss', id='team-b-form-3'),
+                                html.Span(className='team-form-win', id='team-b-form-4'),
+                                html.Span(className='team-form-loss', id='team-b-form-5')
+                            ]
+                        ),
                         html.P(className='team-win-prob', children="50%", id='team-b-win-prob')
                     ]
                 ),
@@ -93,6 +113,34 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
+@app.callback(
+        [Output('team-a-form-1', 'className'), Output('team-a-form-2', 'className'),
+         Output('team-a-form-3', 'className'), Output('team-a-form-4', 'className'),
+         Output('team-a-form-5', 'className'),
+         Output('team-b-form-1', 'className'), Output('team-b-form-2', 'className'),
+         Output('team-b-form-3', 'className'), Output('team-b-form-4', 'className'),
+         Output('team-b-form-5', 'className')],
+        [Input('competition-gender', 'value'), Input('home_team', 'value'), Input('away_team', 'value')]
+)
+def update_team_forms(gender, teama, teamb):
+    """Callback to update team form."""
+
+    if app_utils.cannot_update_visuals(gender, teama, teamb):
+        return no_update
+    
+    # Get home and away team, and forms
+    match_id, home_team, away_team = app_utils.get_match_id(2023, teama, teamb)
+    home_form = team_forms.loc[team_forms.Team == home_team].reset_index(drop=True).iloc[0]
+    away_form = team_forms.loc[team_forms.Team == away_team].reset_index(drop=True).iloc[0]
+    
+    # Function to get CSS form class
+    form_class = lambda x: 'team-form-win' if x == 'W' else 'team-form-loss'
+
+    return (form_class(home_form.G1), form_class(home_form.G2), form_class(home_form.G3), form_class(home_form.G4),
+            form_class(home_form.G5), form_class(away_form.G1), form_class(away_form.G2), form_class(away_form.G3),
+            form_class(away_form.G4), form_class(away_form.G5))
 
 
 @app.callback(

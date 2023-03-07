@@ -89,6 +89,21 @@ body {
     color: #aaaaaa;
 }
 
+.app-body .team-form-win, .app-body .team-form-loss {
+    height: 1em;
+    width: 1em;
+    margin: 0 0.25em;
+    display: inline-block;
+}
+
+.app-body .team-form-win {
+    background-color: yellowgreen;
+}
+
+.app-body .team-form-loss {
+    background-color: indianred;
+}
+
 img {
     max-width: 100%;
 }
