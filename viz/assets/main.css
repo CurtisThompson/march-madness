@@ -67,7 +67,7 @@ body {
 .app-body .team-name {
     display: inline-block;
     width: 30%;
-    margin: 1em 10%;
+    margin: 0.5em 10% 1em;
     padding: 0;
     text-align: center;
 }
@@ -108,7 +108,7 @@ body {
     width: 50%;
     min-width: 300px;
     max-width: 600px;
-    margin: 0 auto 2em;
+    margin: 0 auto;
     text-align: center;
 }
 

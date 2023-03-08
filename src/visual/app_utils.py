@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import shap
+from PIL import Image
 
 
 def get_teams_list(is_women=True):
@@ -38,6 +39,7 @@ def create_force_plot(shapset):
     base_val = shapset['shap_BaseVal']
     shap_vals = shapset[['shap_'+c for c in columns]].values
     column_vals = shapset[columns].values
+    final_shap = sum(shap_vals)+base_val
 
     # Round column values for display
     column_vals = np.array(["{:.2f}".format(c) if type(c) == np.float64 else c for c in column_vals])
@@ -45,16 +47,38 @@ def create_force_plot(shapset):
     # Allocate memory buffer for image
     buffer = io.BytesIO()
 
-    # Plot and save
-    shap.plots.force(base_val, shap_values=shap_vals, features=column_vals, feature_names=columns, out_names='',
+    # Plot
+    shap.plots.force(base_val, shap_values=shap_vals, feature_names=columns, out_names='',
                      matplotlib=True, show=False, contribution_threshold=0)
-    plt.savefig(buffer, format='png')
+    
+    # Modify axes to have 0.5 as centre
+    ax = plt.gca()
+    lim_bot, lim_top = ax.get_xlim()
+    max_lim_move = max(0.5-lim_bot, lim_top-0.5)
+    ax.set_xlim(0.5-max_lim_move, 0.5+max_lim_move)
+    plt.axvline(x=0.5, color='black', linestyle='--', ymin=0.5)
+    plt.axvline(x=final_shap, color='red' if final_shap > 0.5 else 'blue', ymin=0.5)
+
+    # Save plot
+    plt.savefig(buffer, format='png', pad_inches = 0)
     plt.close()
 
     # Get image data from buffer, clear and return
     buffer_data = base64.b64encode(buffer.getbuffer()).decode("utf8")
     buffer.close()
+    buffer_data = chop_force_plot_image(buffer_data)
     return buffer_data
+
+
+def chop_force_plot_image(buffer_data):
+    """Removes white space from bottom of force plot image."""
+    im = Image.open(io.BytesIO(base64.b64decode(buffer_data)))
+    im = im.crop((0, 0, im.size[0], int(im.size[1]/2)))
+    temp_buf = io.BytesIO()
+    im.save(temp_buf, format='png')
+    im_str = base64.b64encode(temp_buf.getbuffer()).decode("utf8")
+    temp_buf.close()
+    return im_str
 
 
 def fancy_win_prob(num):

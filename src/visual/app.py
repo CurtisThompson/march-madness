@@ -66,6 +66,7 @@ app.layout = html.Div(
         html.Div(
             className='app-body',
             children=[
+                html.Img(id="shap-game-prediction", className='shap-image'),
                 html.Div(
                     className='team-name',
                     children=[
@@ -102,9 +103,7 @@ app.layout = html.Div(
                         html.P(className='team-win-prob', children="50%", id='team-b-win-prob')
                     ]
                 ),
-                dash_table.DataTable(id='main-stats-table', data=[]),
-                html.H2(children="Predictor Factors"),
-                html.Img(id="shap-game-prediction", className='shap-image')
+                dash_table.DataTable(id='main-stats-table', data=[])
             ]
         ),
         html.Div(
