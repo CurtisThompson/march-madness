@@ -35,7 +35,6 @@ def predict_frame(df, men_model, women_model, model_columns_men, model_columns_w
 
 def save_predictions(df, file_name="preds", file_path='./data/predictions/'):
     """Save all game predictions to file."""
-    df = df[PRED_COLS]
     df.to_csv(file_path + file_name + '.csv', index=False)
 
 
@@ -53,6 +52,8 @@ def run(model_columns=MODEL_COLS, model_columns_men=None, model_columns_women=No
 
     # Create and save predictions
     df = predict_frame(df, mmodel, wmodel, model_columns_men, model_columns_women)
+    df = df[PRED_COLS]
+    df['Pred'] = df['Pred'].clip(0, 1)
     save_predictions(df, file_name=file_name, file_path=file_path)
 
 
