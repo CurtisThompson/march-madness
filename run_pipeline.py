@@ -10,6 +10,7 @@ from src.etl.etl_elo import calculate_elo
 from src.etl.add_features import build_training_set, build_test_set
 from src.etl.etl_gender import find_gender
 from src.etl.etl_clutch_games import calculate_clutch_win_ratio
+from src.etl.etl_form import get_teams_form
 
 from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     calculate_clutch_win_ratio()
     find_538_ratings(start_year=2016, end_year=2022)
     reformat_seeds()
+    get_teams_form()
     #calculate_elo(K=32)
 
     # Build Datasets

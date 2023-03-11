@@ -126,29 +126,10 @@ def get_teams_win_loss(year):
     return df
 
 
-def get_teams_form():
+def get_teams_form(year=2023):
     """Returns a DataFrame of the results of the last 5 games for each team."""
-
-    # Get all results
-    dfm = pd.read_csv('./data/kaggle/MRegularSeasonCompactResults.csv')
-    dfw = pd.read_csv('./data/kaggle/WRegularSeasonCompactResults.csv')
-    df = pd.concat([dfm, dfw])[['Season', 'DayNum', 'WTeamID', 'LTeamID']]
-    df['Result'] = 'W'
-
-    # Get inverse results (include losing team first)
-    df2 = df.copy()
-    df2[['WTeamID', 'LTeamID']] = df[['LTeamID', 'WTeamID']]
-    df2['Result'] = 'L'
-    df = pd.concat([df, df2], ignore_index=True).sort_values(['Season', 'DayNum']).reset_index(drop=True)
-
-    # Make form DataFrame
-    df_form = pd.DataFrame(df.WTeamID.unique(), columns=['Team'])
-    df = df.groupby('WTeamID')
-    df_form['G1'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-1].Result)
-    df_form['G2'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-2].Result)
-    df_form['G3'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-3].Result)
-    df_form['G4'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-4].Result)
-    df_form['G5'] = df_form.Team.apply(lambda x: df.get_group(x).iloc[-5].Result)
+    df_form = pd.read_csv('./data/etl/team_form.csv').replace(np.nan, 'D', inplace=True)
+    df_form = df_form.loc(df_form.Season == year, ['TeamID', 'G1', 'G2', 'G3', 'G4', 'G5'])
     return df_form
 
 
