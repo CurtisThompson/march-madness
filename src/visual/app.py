@@ -254,6 +254,10 @@ def update_figure(gender, teama, teamb):
     return "data:image/png;base64,{}".format(data)
 
 
+def run_debug_server():
+    app.run_server(debug=True)
+
+
 # Run app by running this script
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    run_debug_server()

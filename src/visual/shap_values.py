@@ -123,6 +123,12 @@ def load_shap_set():
     return df_men, df_women
 
 
+def build_and_save(mens_columns=MODEL_COLS, womens_columns=MODEL_COLS):
+    """Build and save new shap dataset."""
+    df_men, df_women = build_shap_sets(mens_columns=mens_columns, womens_columns=womens_columns)
+    save_shap_set(df_men, df_women)
+
+
 def build_and_plot(is_load_shap_set=False, mens_columns=MODEL_COLS, womens_columns=MODEL_COLS):
     """Build or load the shap dataset, and then create force plots for rows."""
 

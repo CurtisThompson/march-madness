@@ -9,6 +9,7 @@ run_component:
   prediction: True
   submit_prediction: False
   importance: False
+  run_server: False
 
 etl:
   elo_k_factor: 32

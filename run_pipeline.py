@@ -19,6 +19,8 @@ from src.model.predict import run as predict_current_year
 
 from src.submission.kaggle_submission import submit as competition_submit
 
+from src.visual.shap_values import build_and_save as build_shap_sets
+
 
 def run(CONFIG):
     """Run complete ML pipeline."""
@@ -75,6 +77,16 @@ def run(CONFIG):
     # Submit Predictions To Competition
     if CONFIG['run_component']['submit_prediction']:
         competition_submit(comp=CONFIG['kaggle']['competition'], message=CONFIG['kaggle']['submit_message'])
+    
+    # Build shap datasets
+    if CONFIG['run_component']['submit_prediction']:
+        build_shap_sets(mens_columns=CONFIG['model']['mens_columns'],
+                        womens_columns=CONFIG['model']['womens_columns'])
+
+    # Run webpage server
+    if CONFIG['run_component']['run_server']:
+        from src.visual.app import run_debug_server
+        run_debug_server()
 
 
 if __name__ == "__main__":
