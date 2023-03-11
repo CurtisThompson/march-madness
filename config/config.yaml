@@ -1,5 +1,15 @@
 random_state: 0
 
+run_component:
+  ingestion: False
+  etl: True
+  etl_elo: False
+  training: True
+  tuning: True
+  prediction: True
+  submit_prediction: False
+  importance: False
+
 etl:
   elo_k_factor: 32
   clutch_score_gap_max: 3
@@ -22,7 +32,6 @@ model:
     - WinRatioB
     - ClutchRatioA
     - ClutchRatioB
-  is_tune: True
   optimisation_iterations: 50
   optimisation_initial: 10
 
