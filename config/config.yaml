@@ -1,7 +1,31 @@
+random_state: 0
+
 etl:
   elo_k_factor: 32
+  clutch_score_gap_max: 3
   538_start_year: 2016
   538_end_year: 2022
+  training_start_year: 1985
+
+model:
+  mens_columns:
+    - SeedDiff
+    - EloWinProbA
+    - WinRatioA
+    - WinRatioB
+    - ClutchRatioA
+    - ClutchRatioB
+  womens_columns:
+    - SeedDiff
+    - EloWinProbA
+    - WinRatioA
+    - WinRatioB
+    - ClutchRatioA
+    - ClutchRatioB
+  is_tune: True
+  optimisation_iterations: 50
+  optimisation_initial: 10
 
 kaggle:
+  competition: march-machine-learning-mania-2023
   submit_message: Test API Submission
