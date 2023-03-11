@@ -1,5 +1,7 @@
 import os
 
+from config.config import get_config
+
 from src.ingestion.ingestion_kaggle_march_madness import download as download_kaggle
 from src.ingestion.ingestion_five_three_eight import download as download_538
 
@@ -16,6 +18,10 @@ from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
 
 from src.submission.kaggle_submission import submit as competition_submit
+
+
+CONFIG = get_config()
+
 
 
 if __name__ == "__main__":
@@ -35,20 +41,20 @@ if __name__ == "__main__":
 
     # Ingestion
     #download_kaggle()
-    #download_538(start_year=2016, end_year=2022)
+    #download_538(start_year=CONFIG['etl']['538_start_year'], end_year=CONFIG['etl']['538_end_year'])
 
     # ETL
     find_gender()
     save_win_ratios()
     calculate_clutch_win_ratio()
-    find_538_ratings(start_year=2016, end_year=2022)
+    find_538_ratings(start_year=CONFIG['etl']['538_start_year'], end_year=CONFIG['etl']['538_end_year'])
     reformat_seeds()
     get_teams_form()
-    #calculate_elo(K=32)
+    #calculate_elo(K=CONFIG['etl']['elo_k_factor'])
 
     # Build Datasets
-    build_training_set(elo_K=32)
-    build_test_set(elo_K=32)
+    build_training_set(elo_K=CONFIG['etl']['elo_k_factor'])
+    build_test_set(elo_K=CONFIG['etl']['elo_k_factor'])
 
     # Build Models
     validate_and_build_model()
@@ -57,4 +63,4 @@ if __name__ == "__main__":
     predict_current_year()
 
     # Submit Predictions To Competition
-    #competition_submit(message='Test API Submission')
+    #competition_submit(message=CONFIG['kaggle']['submit_message'])

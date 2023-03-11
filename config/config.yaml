@@ -1,6 +1,7 @@
-test_list:
-  val: 0
-  oops: 4
-  what: 2
+etl:
+  elo_k_factor: 32
+  538_start_year: 2016
+  538_end_year: 2022
 
-extra_test: noooo
+kaggle:
+  submit_message: Test API Submission
