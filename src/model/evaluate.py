@@ -50,7 +50,7 @@ def cross_validate_model(training_data, training_columns=TRAINING_COLS, start_ye
             model = build_model(df_train, training_columns=training_columns, params=params)
 
             # Get predictions for year
-            preds_proba = model.predict_proba(df_valid[TRAINING_COLS])[:,1]
+            preds_proba = model.predict_proba(df_valid[training_columns])[:,1]
             preds_cat = [1 if x >= 0.5 else 0 for x in preds_proba]
 
             # Get metrics
@@ -132,7 +132,7 @@ def validate_and_build_model(model_name='default_model', training_columns_men=TR
 
         # Find training columns
         training_columns = training_columns_men if gen == 'men' else training_columns_women
-
+        
         # Find best hyperparameters by tuning
         if tune:
             print()
