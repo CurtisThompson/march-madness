@@ -53,8 +53,8 @@ def run(CONFIG):
         calculate_clutch_win_ratio(max_score_gap=CONFIG['etl']['clutch_score_gap_max'])
         find_538_ratings(start_year=CONFIG['etl']['538_start_year'], end_year=CONFIG['etl']['538_end_year'])
         reformat_seeds()
-        get_teams_form()
-        find_all_team_matchups()
+        get_teams_form(form_game_window=CONFIG['etl']['form_game_window'], form_game_similar=CONFIG['etl']['form_game_similar'])
+        find_all_team_matchups(current_year=CONFIG['current_year'])
         if CONFIG['run_component']['etl_elo']:
             calculate_elo(K=CONFIG['etl']['elo_k_factor'])
 

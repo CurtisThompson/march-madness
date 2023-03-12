@@ -1,12 +1,13 @@
 random_state: 0
+current_year: 2023
 
 run_component:
   ingestion: False
-  etl: True
+  etl: False
   etl_elo: False
   training: True
   tuning: True
-  prediction: True
+  prediction: False
   submit_prediction: False
   importance: False
   run_server: False
@@ -16,6 +17,8 @@ etl:
   clutch_score_gap_max: 3
   538_start_year: 2016
   538_end_year: 2022
+  form_game_window: 10
+  form_game_similar: 3
   training_start_year: 1985
 
 model:
@@ -26,6 +29,9 @@ model:
     - WinRatioB
     - ClutchRatioA
     - ClutchRatioB
+    - FormHarmonicA
+    - FormHarmonicB
+    - Round
   womens_columns:
     - SeedDiff
     - EloWinProbA
@@ -33,6 +39,9 @@ model:
     - WinRatioB
     - ClutchRatioA
     - ClutchRatioB
+    - FormHarmonicA
+    - FormHarmonicB
+    - Round
   optimisation_iterations: 50
   optimisation_initial: 10
 
