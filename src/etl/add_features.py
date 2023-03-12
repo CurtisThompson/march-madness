@@ -15,6 +15,19 @@ def add_win_ratio(df):
     return df
 
 
+def add_form(df):
+    """Merge win ratio and pts rato into DataFrame."""
+    forms = pd.read_csv('./data/etl/team_form.csv')
+    forms = forms[['Season', 'TeamID', 'FormHarmonic', 'FormUniform']]
+    df = pd.merge(df, forms, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'FormHarmonic':'FormHarmonicA', 'FormUniform':'FormUniformA'}, axis=1).drop('TeamID', axis=1)
+    df = pd.merge(df, forms, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'FormHarmonic':'FormHarmonicB', 'FormUniform':'FormUniformB'}, axis=1).drop('TeamID', axis=1)
+    df[['FormHarmonicA', 'FormHarmonicB']] = df[['FormHarmonicA', 'FormHarmonicB']].fillna(0.5)
+    df[['FormUniformA', 'FormUniformB']] = df[['FormUniformA', 'FormUniformB']].fillna(0.5)
+    return df
+
+
 def add_538_ratings(df):
     """Merge 538 ratings into DataFrame."""
     ratings = pd.read_csv('./data/etl/538_ratings.csv')
@@ -105,6 +118,7 @@ def build_training_set(elo_K=32, start_year=1985):
 
     # Add training features
     df = add_gender(df)
+    df = add_form(df)
     df = add_win_ratio(df)
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
@@ -137,6 +151,7 @@ def build_test_set(elo_K=32):
     
     # Add training features
     df = add_gender(df)
+    df = add_form(df)
     df = add_win_ratio(df)
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
