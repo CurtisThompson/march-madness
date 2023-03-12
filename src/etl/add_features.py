@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def add_win_ratio(df):
-    """Merge win ratio and pts rato into DataFrame."""
+    """Merge win ratio and pts ratio into DataFrame."""
     win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
     win_ratios = win_ratios[['Season', 'TeamID', 'WinRatio', 'PtsForRatio']]
     df = pd.merge(df, win_ratios, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
@@ -16,7 +16,7 @@ def add_win_ratio(df):
 
 
 def add_form(df):
-    """Merge win ratio and pts rato into DataFrame."""
+    """Merge form values into DataFrame."""
     forms = pd.read_csv('./data/etl/team_form.csv')
     forms = forms[['Season', 'TeamID', 'FormHarmonic', 'FormUniform']]
     df = pd.merge(df, forms, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
@@ -37,6 +37,18 @@ def add_538_ratings(df):
     df = df.rename({'Rating':'RatingB'}, axis=1).drop('TeamID', axis=1)
     df[['RatingA', 'RatingB']] = df[['RatingA', 'RatingB']].fillna(60)
     df['RatingDiff'] = df.RatingA - df.RatingB
+    return df
+
+
+def add_tournament_round(df):
+    """Merge tournament rounds into DataFrame."""
+    ratings = pd.read_csv('./data/etl/tournament_rounds.csv')
+    df = pd.merge(df,
+                  ratings,
+                  how='left',
+                  left_on=['Season', 'TeamA', 'TeamB'],
+                  right_on=['Season', 'TeamA', 'TeamB'])
+    df['Round'] = df['Round'].fillna(0)
     return df
 
 
@@ -122,6 +134,7 @@ def build_training_set(elo_K=32, start_year=1985):
     df = add_win_ratio(df)
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
+    df = add_tournament_round(df)
     df = add_538_ratings(df)
     df = add_clutch(df)
     
@@ -155,6 +168,7 @@ def build_test_set(elo_K=32):
     df = add_win_ratio(df)
     df = add_elo(df, K=elo_K)
     df = add_seeds(df)
+    df = add_tournament_round(df)
     df = add_538_ratings(df)
     df = add_clutch(df)
 

@@ -13,6 +13,7 @@ from src.etl.add_features import build_training_set, build_test_set
 from src.etl.etl_gender import find_gender
 from src.etl.etl_clutch_games import calculate_clutch_win_ratio
 from src.etl.etl_form import get_teams_form
+from src.etl.etl_tournament_round import find_all_team_matchups
 
 from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
@@ -53,6 +54,7 @@ def run(CONFIG):
         find_538_ratings(start_year=CONFIG['etl']['538_start_year'], end_year=CONFIG['etl']['538_end_year'])
         reformat_seeds()
         get_teams_form()
+        find_all_team_matchups()
         if CONFIG['run_component']['etl_elo']:
             calculate_elo(K=CONFIG['etl']['elo_k_factor'])
 
