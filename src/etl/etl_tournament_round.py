@@ -115,6 +115,7 @@ def find_all_team_matchups(current_year=2023):
     
     # Combine and save
     df = pd.concat([m_matchups, w_matchups], ignore_index=True)
+    df = df.drop_duplicates(ignore_index=True)
     df.to_csv('./data/etl/tournament_rounds.csv', index=False)
 
 

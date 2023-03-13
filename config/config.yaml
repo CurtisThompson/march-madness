@@ -2,12 +2,12 @@ random_state: 0
 current_year: 2023
 
 run_component:
-  ingestion: False
-  etl: False
-  etl_elo: False
+  ingestion: True
+  etl: True
+  etl_elo: True
   training: True
   tuning: True
-  prediction: False
+  prediction: True
   submit_prediction: False
   importance: False
   run_server: False
