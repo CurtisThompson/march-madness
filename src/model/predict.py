@@ -1,5 +1,5 @@
 import pandas as pd
-from xgboost import XGBClassifier
+from joblib import load
 
 
 MODEL_COLS = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA', 'ClutchRatioB']
@@ -13,10 +13,8 @@ def load_submission_frame():
 
 def load_models(name='default_model'):
     """Loads separate mens and womens classifier models."""
-    men_model = XGBClassifier()
-    men_model.load_model(f'./data/models/{name}_men.mdl')
-    women_model = XGBClassifier()
-    women_model.load_model(f'./data/models/{name}_women.mdl')
+    men_model = load(f'./data/models/{name}_men.mdl')
+    women_model = load(f'./data/models/{name}_women.mdl')
     return men_model, women_model
 
 
@@ -27,7 +25,6 @@ def predict_row(row):
 
 def predict_frame(df, men_model, women_model, model_columns_men, model_columns_women):
     """Predict the outcome of multiple games."""
-    #df['Pred'] = df.apply(predict_row, axis=1)
     df.loc[df['Gender'] == 0, 'Pred'] = men_model.predict_proba(df.loc[df['Gender'] == 0][model_columns_men])[:,1]
     df.loc[df['Gender'] == 1, 'Pred'] = women_model.predict_proba(df.loc[df['Gender'] == 1][model_columns_women])[:,1]
     return df
