@@ -44,6 +44,8 @@ model:
     - Round
   optimisation_iterations: 50
   optimisation_initial: 10
+  calibrate: False
+  calibration_size: 0.2
 
 kaggle:
   competition: march-machine-learning-mania-2023

@@ -69,7 +69,9 @@ def run(CONFIG):
                                  tune=CONFIG['run_component']['tuning'],
                                  random_state=CONFIG['random_state'],
                                  optimisation_iterations=CONFIG['model']['optimisation_iterations'],
-                                 optimisation_initial_points=CONFIG['model']['optimisation_initial'])
+                                 optimisation_initial_points=CONFIG['model']['optimisation_initial'],
+                                 calibrate=CONFIG['model']['calibrate'],
+                                 calibrator_size=CONFIG['model']['calibration_size'])
 
     # Predictions
     if CONFIG['run_component']['prediction']:
