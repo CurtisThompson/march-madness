@@ -15,6 +15,21 @@ def add_win_ratio(df):
     return df
 
 
+def add_massey(df):
+    """Merge massey ranking stats into DataFrame."""
+    massey = pd.read_csv('./data/etl/massey.csv')
+    df = pd.merge(df, massey, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename({'MasseyMedian':'MasseyMedianA', 'MasseyMean':'MasseyMeanA',
+                    'MasseyStd' : 'MasseyStdA'}, axis=1).drop('TeamID', axis=1)
+    df = pd.merge(df, massey, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename({'MasseyMedian':'MasseyMedianB', 'MasseyMean':'MasseyMeanB',
+                    'MasseyStd' : 'MasseyStdB'}, axis=1).drop('TeamID', axis=1)
+    df[['MasseyMedianA', 'MasseyMedianB']] = df[['MasseyMedianA', 'MasseyMedianB']].fillna(0)
+    df[['MasseyMeanA', 'MasseyMeanB']] = df[['MasseyMeanA', 'MasseyMeanB']].fillna(0)
+    df[['MasseyStdA', 'MasseyStdB']] = df[['MasseyStdA', 'MasseyStdB']].fillna(0)
+    return df
+
+
 def add_form(df):
     """Merge form values into DataFrame."""
     forms = pd.read_csv('./data/etl/team_form.csv')
@@ -137,11 +152,12 @@ def build_training_set(elo_K=32, mens_start_year=1985, womens_start_year=1985):
     df = add_tournament_round(df)
     df = add_538_ratings(df)
     df = add_clutch(df)
+    df = add_massey(df)
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
-    df = df[(df.Season >= mens_start_year & df.Gender == 0) |
-            (df.Season >= womens_start_year & df.Gender == 1)]
+    df = df[((df.Season >= mens_start_year) & (df.Gender == 0)) |
+            ((df.Season >= womens_start_year) & (df.Gender == 1))]
     df.to_csv('./data/etl/training_set.csv', index=False)
 
 
@@ -172,6 +188,7 @@ def build_test_set(elo_K=32):
     df = add_tournament_round(df)
     df = add_538_ratings(df)
     df = add_clutch(df)
+    df = add_massey(df)
 
     # Save training set
     df.to_csv('./data/etl/test_set.csv', index=False)

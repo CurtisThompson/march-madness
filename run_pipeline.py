@@ -14,6 +14,7 @@ from src.etl.etl_gender import find_gender
 from src.etl.etl_clutch_games import calculate_clutch_win_ratio
 from src.etl.etl_form import get_teams_form
 from src.etl.etl_tournament_round import find_all_team_matchups
+from src.etl.etl_massey import calculate_massey
 
 from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
@@ -55,6 +56,7 @@ def run(CONFIG):
         reformat_seeds()
         get_teams_form(form_game_window=CONFIG['etl']['form_game_window'], form_game_similar=CONFIG['etl']['form_game_similar'])
         find_all_team_matchups(current_year=CONFIG['current_year'])
+        calculate_massey()
         if CONFIG['run_component']['etl_elo']:
             calculate_elo(K=CONFIG['etl']['elo_k_factor'])
 
