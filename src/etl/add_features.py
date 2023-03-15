@@ -1,56 +1,65 @@
-import numpy as np
 import pandas as pd
+
+
+def merge_team_features(df, file_path, columns, nan_value=0):
+    """Combines a feature file with the training set twice, once for each team
+       to add their features."""
+    # Load in file and get correct columns
+    file = pd.read_csv(file_path)
+    file = file[['Season', 'TeamID'] + columns]
+
+    # Merge for team A
+    cols_a = [str(x)+'A' for x in columns]
+    conv_dict = dict(zip(columns, cols_a))
+    df = pd.merge(df, file, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = df.rename(columns=conv_dict).drop('TeamID', axis=1)
+
+    # Merge for team B
+    cols_b = [str(x)+'B' for x in columns]
+    conv_dict = dict(zip(columns, cols_b))
+    df = pd.merge(df, file, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = df.rename(columns=conv_dict).drop('TeamID', axis=1)
+
+    # Fill NaN
+    cols = cols_a + cols_b
+    df[cols] = df[cols].fillna(nan_value)
+
+    return df
 
 
 def add_win_ratio(df):
     """Merge win ratio and pts ratio into DataFrame."""
-    win_ratios = pd.read_csv('./data/etl/win_ratios.csv')
-    win_ratios = win_ratios[['Season', 'TeamID', 'WinRatio', 'PtsForRatio']]
-    df = pd.merge(df, win_ratios, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'WinRatio':'WinRatioA', 'PtsForRatio':'PtsForRatioA'}, axis=1).drop('TeamID', axis=1)
-    df = pd.merge(df, win_ratios, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'WinRatio':'WinRatioB', 'PtsForRatio':'PtsForRatioB'}, axis=1).drop('TeamID', axis=1)
-    df[['WinRatioA', 'WinRatioB']] = df[['WinRatioA', 'WinRatioB']].fillna(0)
-    df[['PtsForRatioA', 'PtsForRatioB']] = df[['PtsForRatioA', 'PtsForRatioB']].fillna(0)
+    df = merge_team_features(df,
+                             './data/etl/win_ratios.csv',
+                             ['WinRatio', 'PtsForRatio'],
+                             nan_value=0)
     return df
 
 
 def add_massey(df):
     """Merge massey ranking stats into DataFrame."""
-    massey = pd.read_csv('./data/etl/massey.csv')
-    df = pd.merge(df, massey, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'MasseyMedian':'MasseyMedianA', 'MasseyMean':'MasseyMeanA',
-                    'MasseyStd' : 'MasseyStdA'}, axis=1).drop('TeamID', axis=1)
-    df = pd.merge(df, massey, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'MasseyMedian':'MasseyMedianB', 'MasseyMean':'MasseyMeanB',
-                    'MasseyStd' : 'MasseyStdB'}, axis=1).drop('TeamID', axis=1)
-    df[['MasseyMedianA', 'MasseyMedianB']] = df[['MasseyMedianA', 'MasseyMedianB']].fillna(0)
-    df[['MasseyMeanA', 'MasseyMeanB']] = df[['MasseyMeanA', 'MasseyMeanB']].fillna(0)
-    df[['MasseyStdA', 'MasseyStdB']] = df[['MasseyStdA', 'MasseyStdB']].fillna(0)
+    df = merge_team_features(df,
+                             './data/etl/massey.csv',
+                             ['MasseyMedian', 'MasseyMean', 'MasseyStd'],
+                             nan_value=0)
     return df
 
 
 def add_form(df):
     """Merge form values into DataFrame."""
-    forms = pd.read_csv('./data/etl/team_form.csv')
-    forms = forms[['Season', 'TeamID', 'FormHarmonic', 'FormUniform']]
-    df = pd.merge(df, forms, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'FormHarmonic':'FormHarmonicA', 'FormUniform':'FormUniformA'}, axis=1).drop('TeamID', axis=1)
-    df = pd.merge(df, forms, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'FormHarmonic':'FormHarmonicB', 'FormUniform':'FormUniformB'}, axis=1).drop('TeamID', axis=1)
-    df[['FormHarmonicA', 'FormHarmonicB']] = df[['FormHarmonicA', 'FormHarmonicB']].fillna(0.5)
-    df[['FormUniformA', 'FormUniformB']] = df[['FormUniformA', 'FormUniformB']].fillna(0.5)
+    df = merge_team_features(df,
+                             './data/etl/team_form.csv',
+                             ['FormHarmonic', 'FormUniform'],
+                             nan_value=0.5)
     return df
 
 
 def add_538_ratings(df):
     """Merge 538 ratings into DataFrame."""
-    ratings = pd.read_csv('./data/etl/538_ratings.csv')
-    df = pd.merge(df, ratings, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'Rating':'RatingA'}, axis=1).drop('TeamID', axis=1)
-    df = pd.merge(df, ratings, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'Rating':'RatingB'}, axis=1).drop('TeamID', axis=1)
-    df[['RatingA', 'RatingB']] = df[['RatingA', 'RatingB']].fillna(60)
+    df = merge_team_features(df,
+                             './data/etl/538_ratings.csv',
+                             ['Rating'],
+                             nan_value=60)
     df['RatingDiff'] = df.RatingA - df.RatingB
     return df
 
@@ -69,24 +78,20 @@ def add_tournament_round(df):
 
 def add_seeds(df):
     """Merge tournament seeds into DataFrame."""
-    seeds = pd.read_csv('./data/etl/seeds.csv')
-    df = pd.merge(df, seeds, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'Seed':'SeedA'}, axis=1).drop('TeamID', axis=1)
-    df = pd.merge(df, seeds, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'Seed':'SeedB'}, axis=1).drop('TeamID', axis=1)
-    df[['SeedA', 'SeedB']] = df[['SeedA', 'SeedB']].fillna(16)
+    df = merge_team_features(df,
+                             './data/etl/seeds.csv',
+                             ['Seed'],
+                             nan_value=16)
     df['SeedDiff'] = df.SeedA - df.SeedB
     return df
 
 
 def add_elo(df, K=32):
     """Merge Elo ratings into DataFrame."""
-    elos = pd.read_csv(f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv')
-    df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'Elo':'EloA'}, axis=1).drop('TeamID', axis=1)
-    df = pd.merge(df, elos, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'Elo':'EloB'}, axis=1).drop('TeamID', axis=1)
-    df[['EloA', 'EloB']] = df[['EloA', 'EloB']].fillna(1500)
+    df = merge_team_features(df,
+                             f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv',
+                             ['Elo'],
+                             nan_value=1500)
     df['EloDiff'] = df.EloA - df.EloB
     df['EloWinProbA'] = 1 / (1 + ( 10 ** ((df.EloB-df.EloA) / 400) ))
     df['EloWinProbB'] = 1 / (1 + ( 10 ** ((df.EloA-df.EloB) / 400) ))
@@ -104,12 +109,10 @@ def add_gender(df):
 
 def add_clutch(df):
     """Merge clutch game features with DataFrame."""
-    df_clutch = pd.read_csv('./data/etl/clutch_games.csv')
-    df = pd.merge(df, df_clutch, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
-    df = df.rename({'ClutchRatio':'ClutchRatioA'}, axis=1).drop(['TeamID', 'ClutchWins', 'ClutchLosses'], axis=1)
-    df = pd.merge(df, df_clutch, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
-    df = df.rename({'ClutchRatio':'ClutchRatioB'}, axis=1).drop(['TeamID', 'ClutchWins', 'ClutchLosses'], axis=1)
-    df[['ClutchRatioA', 'ClutchRatioB']] = df[['ClutchRatioA', 'ClutchRatioB']].fillna(0.5)
+    df = merge_team_features(df,
+                             './data/etl/clutch_games.csv',
+                             ['ClutchRatio'],
+                             nan_value=0.5)
     return df
 
 
