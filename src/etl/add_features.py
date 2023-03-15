@@ -98,7 +98,7 @@ def add_clutch(df):
     return df
 
 
-def build_training_set(elo_K=32, start_year=1985):
+def build_training_set(elo_K=32, mens_start_year=1985, womens_start_year=1985):
     """Calculate all features for training dataset and save to file."""
 
     # Load mens tourney results
@@ -140,7 +140,8 @@ def build_training_set(elo_K=32, start_year=1985):
     
     # Save training set
     df = df.sort_values('Season', ignore_index=True)
-    df = df[df.Season >= start_year]
+    df = df[(df.Season >= mens_start_year & df.Gender == 0) |
+            (df.Season >= womens_start_year & df.Gender == 1)]
     df.to_csv('./data/etl/training_set.csv', index=False)
 
 

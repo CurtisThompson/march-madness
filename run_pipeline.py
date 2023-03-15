@@ -59,7 +59,9 @@ def run(CONFIG):
             calculate_elo(K=CONFIG['etl']['elo_k_factor'])
 
         # Build Datasets
-        build_training_set(elo_K=CONFIG['etl']['elo_k_factor'], start_year=CONFIG['etl']['training_start_year'])
+        build_training_set(elo_K=CONFIG['etl']['elo_k_factor'],
+                           mens_start_year=CONFIG['etl']['mens_training_start_year'],
+                           womens_start_year=CONFIG['etl']['womens_training_start_year'])
         build_test_set(elo_K=CONFIG['etl']['elo_k_factor'])
 
     # Build Models

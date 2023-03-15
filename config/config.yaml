@@ -19,7 +19,8 @@ etl:
   538_end_year: 2022
   form_game_window: 10
   form_game_similar: 3
-  training_start_year: 1985
+  mens_training_start_year: 1985
+  womens_training_start_year: 1985
 
 model:
   mens_columns:
