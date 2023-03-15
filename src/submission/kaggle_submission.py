@@ -3,8 +3,9 @@ from os.path import join
 import pandas as pd
 
 
-def submit(file_name='preds', file_path='./data/predictions/', comp='march-machine-learning-mania-2023',
-           message="API Submission"):
+def submit(file_name='preds', file_path='./data/predictions/',
+           comp='march-machine-learning-mania-2023', message='API Submission',
+           include_metric=False, metric=None):
     """Submit predictions to Kaggle competition."""
 
     # Authenticate through API
@@ -13,6 +14,10 @@ def submit(file_name='preds', file_path='./data/predictions/', comp='march-machi
 
     # Get file path
     path = join(file_path, f'{file_name}.csv')
+
+    # Append metric to message if needed
+    if include_metric and metric != None:
+        message = str(message) + ' | Validation: ' + str(metric)
 
     # Submit to competition
     api.competition_submit(path, message, comp)

@@ -51,3 +51,4 @@ model:
 kaggle:
   competition: march-machine-learning-mania-2023
   submit_message: Test API Submission
+  include_metric_in_message: True

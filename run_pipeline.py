@@ -65,15 +65,16 @@ def run(CONFIG):
         build_test_set(elo_K=CONFIG['etl']['elo_k_factor'])
 
     # Build Models
+    mtrc = 'Unknown'
     if CONFIG['run_component']['training']:
-        validate_and_build_model(training_columns_men=CONFIG['model']['mens_columns'],
-                                 training_columns_women=CONFIG['model']['womens_columns'],
-                                 tune=CONFIG['run_component']['tuning'],
-                                 random_state=CONFIG['random_state'],
-                                 optimisation_iterations=CONFIG['model']['optimisation_iterations'],
-                                 optimisation_initial_points=CONFIG['model']['optimisation_initial'],
-                                 calibrate=CONFIG['model']['calibrate'],
-                                 calibrator_size=CONFIG['model']['calibration_size'])
+        mtrc = validate_and_build_model(training_columns_men=CONFIG['model']['mens_columns'],
+                                        training_columns_women=CONFIG['model']['womens_columns'],
+                                        tune=CONFIG['run_component']['tuning'],
+                                        random_state=CONFIG['random_state'],
+                                        optimisation_iterations=CONFIG['model']['optimisation_iterations'],
+                                        optimisation_initial_points=CONFIG['model']['optimisation_initial'],
+                                        calibrate=CONFIG['model']['calibrate'],
+                                        calibrator_size=CONFIG['model']['calibration_size'])
 
     # Predictions
     if CONFIG['run_component']['prediction']:
@@ -82,7 +83,10 @@ def run(CONFIG):
 
     # Submit Predictions To Competition
     if CONFIG['run_component']['submit_prediction']:
-        competition_submit(comp=CONFIG['kaggle']['competition'], message=CONFIG['kaggle']['submit_message'])
+        competition_submit(comp=CONFIG['kaggle']['competition'],
+                           message=CONFIG['kaggle']['submit_message'],
+                           include_metric=CONFIG['kaggle']['include_metric_in_message'],
+                           metric=mtrc)
     
     # Build shap datasets
     if CONFIG['run_component']['submit_prediction']:
