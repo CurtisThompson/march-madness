@@ -2,13 +2,13 @@ random_state: 0
 current_year: 2023
 
 run_component:
-  ingestion: True
-  etl: True
-  etl_elo: True
-  training: True
-  tuning: True
-  prediction: True
-  submit_prediction: False
+  ingestion: False
+  etl: False
+  etl_elo: False
+  training: False
+  tuning: False
+  prediction: False
+  submit_prediction: True
   importance: False
   run_server: False
 
@@ -16,10 +16,10 @@ etl:
   elo_k_factor: 32
   clutch_score_gap_max: 3
   538_start_year: 2016
-  538_end_year: 2022
+  538_end_year: 2023
   form_game_window: 10
   form_game_similar: 3
-  mens_training_start_year: 1985
+  mens_training_start_year: 2003
   womens_training_start_year: 1985
 
 model:
@@ -32,7 +32,17 @@ model:
     - ClutchRatioB
     - FormHarmonicA
     - FormHarmonicB
+    - FormUniformA
+    - FormUniformB
     - Round
+    - MasseyMeanA
+    - MasseyMeanB
+    - MasseyMeanDiff
+    - MasseyMedianA
+    - MasseyMedianB
+    - MasseyMedianDiff
+    - MasseyStdA
+    - MasseyStdB
   womens_columns:
     - SeedDiff
     - EloWinProbA
@@ -50,5 +60,5 @@ model:
 
 kaggle:
   competition: march-machine-learning-mania-2023
-  submit_message: Test API Submission
-  include_metric_in_message: True
+  submit_message: Note
+  include_metric_in_message: False

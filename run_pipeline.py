@@ -91,7 +91,7 @@ def run(CONFIG):
                            metric=mtrc)
     
     # Build shap datasets
-    if CONFIG['run_component']['submit_prediction']:
+    if CONFIG['run_component']['importance']:
         build_shap_sets(mens_columns=CONFIG['model']['mens_columns'],
                         womens_columns=CONFIG['model']['womens_columns'])
 
@@ -99,6 +99,8 @@ def run(CONFIG):
     if CONFIG['run_component']['run_server']:
         from src.visual.app import run_debug_server
         run_debug_server()
+    
+    return mtrc
 
 
 if __name__ == "__main__":

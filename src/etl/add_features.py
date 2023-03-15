@@ -42,6 +42,8 @@ def add_massey(df):
                              './data/etl/massey.csv',
                              ['MasseyMedian', 'MasseyMean', 'MasseyStd'],
                              nan_value=0)
+    df['MasseyMedianDiff'] = df['MasseyMedianA'] - df['MasseyMedianB']
+    df['MasseyMeanDiff'] = df['MasseyMeanA'] - df['MasseyMeanB']
     return df
 
 

@@ -213,8 +213,8 @@ def validate_and_build_model(model_name='default_model', training_columns_men=TR
                             calibrate=calibrate, calibrator_size=calibrator_size)
         dump(model, f'./data/models/{model_name}_{gen}.mdl')
 
-        # Return brier validation metric
-        return calib if calibrate else brier
+    # Return brier validation metric
+    return calib if calibrate else brier
 
 
 if __name__ == "__main__":
