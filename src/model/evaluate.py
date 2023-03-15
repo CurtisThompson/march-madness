@@ -201,14 +201,20 @@ def validate_and_build_model(model_name='default_model', training_columns_men=TR
             params = DEFAULT_PARAMS
 
         # CV and output metrics
-        cross_validate_model(data, training_columns=training_columns, params=params,
-                             calibrate=calibrate, random_state=random_state,
-                             calibrator_size=calibrator_size)
+        _, brier, _, _, calib = cross_validate_model(data,
+                                                     training_columns=training_columns,
+                                                     params=params,
+                                                     calibrate=calibrate,
+                                                     random_state=random_state,
+                                                     calibrator_size=calibrator_size)
 
         # Build final model and save
         model = build_model(data, training_columns=training_columns, params=params,
                             calibrate=calibrate, calibrator_size=calibrator_size)
         dump(model, f'./data/models/{model_name}_{gen}.mdl')
+
+        # Return brier validation metric
+        return calib if calibrate else brier
 
 
 if __name__ == "__main__":
