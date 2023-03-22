@@ -19,11 +19,13 @@ etl:
   538_end_year: 2023
   form_game_window: 10
   form_game_similar: 3
-  mens_training_start_year: 2003
+  mens_training_start_year: 1985
   womens_training_start_year: 1985
 
 model:
   mens_columns:
+    - SeedA
+    - SeedB
     - SeedDiff
     - EloWinProbA
     - WinRatioA
@@ -35,15 +37,11 @@ model:
     - FormUniformA
     - FormUniformB
     - Round
-    - MasseyMeanA
-    - MasseyMeanB
-    - MasseyMeanDiff
-    - MasseyMedianA
-    - MasseyMedianB
-    - MasseyMedianDiff
-    - MasseyStdA
-    - MasseyStdB
+    - PtsForRatioA
+    - PtsForRatioB
   womens_columns:
+    - SeedA
+    - SeedB
     - SeedDiff
     - EloWinProbA
     - WinRatioA
@@ -52,7 +50,11 @@ model:
     - ClutchRatioB
     - FormHarmonicA
     - FormHarmonicB
+    - FormUniformA
+    - FormUniformB
     - Round
+    - PtsForRatioA
+    - PtsForRatioB
   optimisation_iterations: 50
   optimisation_initial: 10
   calibrate: False
@@ -60,5 +62,5 @@ model:
 
 kaggle:
   competition: march-machine-learning-mania-2023
-  submit_message: Note
+  submit_message: Test API Submission
   include_metric_in_message: False
