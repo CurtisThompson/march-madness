@@ -10,13 +10,30 @@ MODEL_COLS = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA
 
 
 def load_features(name='test_set', path='./data/etl/'):
-    """Load in calculated features."""
+    """
+    Load in calculated features.
+    
+    Args:
+        name: File containing test features.
+        path: Directory containing test features.
+    
+    Returns:
+        Pandas DataFrame of features.
+    """
     path = os.path.join(path, name + '.csv')
     return pd.read_csv(path)
 
 
 def load_models(name='default_model'):
-    """Loads separate mens and womens classifier models."""
+    """
+    Load separate mens and womens classifier models.
+    
+    Args:
+        name: Name of models used for classification. String.
+    
+    Returns:
+        Mens model and womens model.
+    """
     men_model = XGBClassifier()
     men_model.load_model(f'./data/models/{name}_men.mdl')
     women_model = XGBClassifier()
@@ -25,13 +42,31 @@ def load_models(name='default_model'):
 
 
 def load_predictions(name='preds', path='./data/predictions/'):
-    """Load model predictions."""
+    """
+    Load model predictions.
+    
+    Args:
+        name: File name containing match predictions.
+        path: Directory containing match predictions.
+    
+    Returns:
+        Pandas DataFrame with match predictions.
+    """
     path = os.path.join(path, name + '.csv')
     return pd.read_csv(path)
 
 
 def load_training_data(name='training_set', path='./data/etl/'):
-    """Load data used to train models."""
+    """
+    Load data used to train models.
+    
+    Args:
+        name: File containing training features. String.
+        path: Directory containing training features. String.
+    
+    Returns:
+        Two Pandas DataFrames, for mens features and womens features.
+    """
     path = os.path.join(path, name + '.csv')
     df = pd.read_csv(path)
     df_women = df.loc[df.Gender == 1]
@@ -40,11 +75,24 @@ def load_training_data(name='training_set', path='./data/etl/'):
 
 
 def get_shap_values(model, df, columns, training_data):
-    """Gets the shap values for a dataset with respect to a given model."""
+    """
+    Gets the shap values for a dataset with respect to a given model.
+    
+    Args:
+        model: Model used for predictions.
+        df: Test dataset to get shap values for.
+        columns: List of columns required for model.
+        training_data: Data used to train model.
+    
+    Returns:
+        Pandas DataFrame containing SHAP values.
+    """
 
     # Get shap values
     shap_cols = ['shap_'+c for c in columns]
-    shap_exp = shap.TreeExplainer(model, model_output='probability', data=training_data[columns])
+    shap_exp = shap.TreeExplainer(model,
+                                  model_output='probability',
+                                  data=training_data[columns])
     shap_vals = shap_exp.shap_values(df[columns])
     shap_vals = pd.DataFrame(shap_vals, columns=shap_cols)
 
@@ -55,7 +103,13 @@ def get_shap_values(model, df, columns, training_data):
 
 
 def force_plot(shapset, columns):
-    """Save a force plot of an individual prediction."""
+    """
+    Save a force plot of an individual prediction.
+    
+    Args:
+        shapset: Pandas DataFrame containing SHAP values.
+        columns: List of columns used for model predictions.
+    """
 
     # Plot values
     row_id = shapset['ID']
@@ -68,14 +122,26 @@ def force_plot(shapset, columns):
     column_vals = np.array(["{:.2f}".format(c) if type(c) == np.float64 else c for c in column_vals])
 
     # Plot and save
-    shap.plots.force(base_val, shap_values=shap_vals, features=column_vals, feature_names=columns, out_names='',
-                     matplotlib=True, show=False, contribution_threshold=0)
+    shap.plots.force(base_val, shap_values=shap_vals, features=column_vals,
+                     feature_names=columns, out_names='', matplotlib=True,
+                     show=False, contribution_threshold=0)
     plt.tight_layout()
     plt.savefig(f'viz/visuals/force_plot_{row_id}.png')
 
 
-def build_shap_sets(mens_columns=MODEL_COLS, womens_columns=MODEL_COLS, model_names='default_model'):
-    """Build a combined dataset of feature values and shap values from the test set."""
+def build_shap_sets(mens_columns=MODEL_COLS, womens_columns=MODEL_COLS,
+                    model_names='default_model'):
+    """
+    Build a combined dataset of feature values and shap values from the test set.
+    
+    Args:
+        mens_columns: List of columns required for mens predictions.
+        womens_columns: List of columns required for womens predictions.
+        model_names: Name of model file. String.
+    
+    Returns:
+        Two Pandas DataFrames, with mens SHAP values and womens SHAP values.
+    """
 
     # Get data
     df = load_features()
@@ -111,26 +177,51 @@ def build_shap_sets(mens_columns=MODEL_COLS, womens_columns=MODEL_COLS, model_na
 
 
 def save_shap_set(df_men, df_women):
-    """Save shap datasets."""
+    """
+    Save shap datasets.
+    
+    Args:
+        df_men: Pandas DataFrame with mens SHAP values.
+        df_women: Pandas DataFrame with womens SHAP values.
+    """
     df_men.to_csv('./data/explain/shap_men.csv', index=False)
     df_women.to_csv('./data/explain/shap_women.csv', index=False)
 
 
 def load_shap_set():
-    """Load shap datasets."""
+    """
+    Load shap datasets.
+    
+    Returns:
+        Two Pandas DataFrames, with mens SHAP values and womens SHAP values.
+    """
     df_men = pd.read_csv('./data/explain/shap_men.csv')
     df_women = pd.read_csv('./data/explain/shap_women.csv')
     return df_men, df_women
 
 
 def build_and_save(mens_columns=MODEL_COLS, womens_columns=MODEL_COLS):
-    """Build and save new shap dataset."""
+    """
+    Build and save new shap dataset.
+
+    Args:
+        mens_columns: List of columns required for mens predictions.
+        womens_columns: List of columns required for womens predictions.
+    """
     df_men, df_women = build_shap_sets(mens_columns=mens_columns, womens_columns=womens_columns)
     save_shap_set(df_men, df_women)
 
 
 def build_and_plot(is_load_shap_set=False, mens_columns=MODEL_COLS, womens_columns=MODEL_COLS):
-    """Build or load the shap dataset, and then create force plots for rows."""
+    """
+    Build or load the shap dataset, and then create force plots for rows.
+    
+    Args:
+        is_load_shap_set: If True, load existing shap dataset, otherwise
+            calculate dataset.
+        mens_columns: List of columns required for mens predictions.
+        womens_columns: List of columns required for womens predictions.
+    """
 
     # Load existing shap set or build it
     if is_load_shap_set:
@@ -147,7 +238,3 @@ def build_and_plot(is_load_shap_set=False, mens_columns=MODEL_COLS, womens_colum
 
 if __name__ == "__main__":
     build_and_plot()
-
-    
-    
-    

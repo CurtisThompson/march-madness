@@ -1,10 +1,18 @@
 from xgboost import XGBClassifier
-from xgboost import plot_tree, plot_importance
+from xgboost import plot_tree
 import matplotlib.pyplot as plt
 
 
 def load_models(name='default_model'):
-    """Loads separate mens and womens classifier models."""
+    """
+    Load separate mens and womens classifier models.
+    
+    Args:
+        name: Name of model to load. String.
+    
+    Returns:
+        Two classifier models, one for mens data and one for womens data.
+    """
     men_model = XGBClassifier()
     men_model.load_model(f'./data/models/{name}_men.mdl')
     women_model = XGBClassifier()

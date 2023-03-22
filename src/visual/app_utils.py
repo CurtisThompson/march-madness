@@ -9,7 +9,15 @@ from PIL import Image
 
 
 def get_teams_list(is_women=True):
-    """Returns a list of dicts with team ID and name as label and value."""
+    """
+    Return a list of dicts with team ID and name as label and value.
+    
+    Args:
+        is_women: If True, get womens team. If False, get mens team.
+    
+    Returns:
+        List of dictionaries with team IDs as value and team name as label.
+    """
     path = './data/kaggle/WTeams.csv' if is_women else './data/kaggle/MTeams.csv'
     teams = pd.read_csv(path).rename(columns={'TeamID':'value', 'TeamName':'label'})
     teams = teams[['label', 'value']].to_dict(orient='records')
@@ -17,22 +25,50 @@ def get_teams_list(is_women=True):
 
 
 def get_teams_dict(team_list):
-    """Returns a label:value dict of team IDs and names."""
+    """
+    Return a label:value dict of team IDs and names.
+
+    Args:
+        team_list: List of dictionaries for each team.
+
+    Returns:
+        Dictionary of team IDs to names.
+    """
     return dict([(x['value'], x['label']) for x in team_list])
 
 
 def load_shap_sets():
-    """Returns separate shap datasets for mens and womens teams."""
+    """
+    Return separate shap datasets for mens and womens teams.
+
+    Returns:
+        Two Pandas DataFrames, for men shap values and women shap values.
+    """
     return pd.read_csv('./data/explain/shap_men.csv'), pd.read_csv('./data/explain/shap_women.csv')
 
 
 def load_game_predictions():
-    """Returns a DataFrame of match predictions for every team."""
+    """
+    Returns a DataFrame of match predictions for every team.
+
+    Returns:
+        Pandas DataFrame with match predictions.
+    """
     return pd.read_csv('./data/predictions/preds.csv')
 
 
 def create_force_plot(shapset):
-    """Builds a base64 string of a shap force plot from a given row in the shap dataset."""
+    """
+    Build a base64 string of a shap force plot from a given row in
+    the shap dataset.
+    
+    Args:
+        shapset: DataFrame of Shap values.
+    
+    Returns:
+        String that includes representation of force plot image, which can
+        be included in a HTML document.
+    """
 
     # Plot values
     columns = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA', 'ClutchRatioB']
@@ -71,7 +107,15 @@ def create_force_plot(shapset):
 
 
 def chop_force_plot_image(buffer_data):
-    """Removes white space from bottom of force plot image."""
+    """
+    Removes white space from bottom of force plot image.
+    
+    Args:
+        buffer_data: base64 string of force plot image.
+    
+    Returns:
+        base64 string of force plot image with whitespace removed.
+    """
     im = Image.open(io.BytesIO(base64.b64decode(buffer_data)))
     im = im.crop((0, 0, im.size[0], int(im.size[1]/2)))
     temp_buf = io.BytesIO()
@@ -82,7 +126,15 @@ def chop_force_plot_image(buffer_data):
 
 
 def fancy_win_prob(num):
-    """Returns a pretty string for a match win probability."""
+    """
+    Returns a pretty string for a match win probability.
+
+    Args:
+        num: Float value between 0 and 1.
+
+    Returns:
+        String represention of input rounded to 1 decimal place, e.g. 74.1%.
+    """
     str1 = str(round(num, 3) * 100)
     str_parts = str1.split('.')
     str_final = str_parts[0]
@@ -92,14 +144,34 @@ def fancy_win_prob(num):
 
 
 def cannot_update_visuals(gender, teama, teamb):
-    """Returns True if inputs mean app visuals cannot be updated."""
+    """
+    Returns True if inputs mean app visuals cannot be updated.
+    
+    Args:
+        gender: Updated gender.
+        teama: Updated team A.
+        teamb: Updated team B.
+    
+    Returns:
+        Boolean. True if any inputs are None, or if teams are same.
+    """
     if (gender == None) or (teama == None) or (teamb == None) or (teama == teamb):
         return True
     return False
 
 
 def get_match_id(year, teama, teamb):
-    """Returns the match ID, as well as home and away teams."""
+    """
+    Return the match ID, as well as home and away teams.
+    
+    Args:
+        year: Prediction year.
+        teama: First user-inputted team.
+        teamb: Second user-inputted team.
+
+    Returns:
+        String of format year_team_team, as well as teams ordered ascending.
+    """
     home_team = min(teama, teamb)
     away_team = max(teama, teamb)
     match_id = str(year) + '_' + str(home_team) + '_' + str(away_team)
@@ -107,7 +179,16 @@ def get_match_id(year, teama, teamb):
 
 
 def get_match_win_probs(df_prob, match_id):
-    """Returns the home and away win probabilities of the match."""
+    """
+    Returns the home and away win probabilities of the match.
+
+    Args:
+        df_prob: Pandas DataFrame of match probabilities.
+        match_id: String of format year_team_team.
+    
+    Returns:
+        Team A win probability and Team B win probability.
+    """
 
     # Find match predictions in shap dataset
     result = df_prob.loc[df_prob.ID == match_id].reset_index(drop=True).iloc[0]
@@ -120,21 +201,46 @@ def get_match_win_probs(df_prob, match_id):
 
 
 def get_teams_win_loss(year):
-    """Returns a DataFrame with win and loss count for each team in given season."""
+    """
+    Returns a DataFrame with win and loss count for each team in given season.
+    
+    Args:
+        year: Season.
+    
+    Returns:
+        Pandas DataFrame.
+    """
     df = pd.read_csv('./data/etl/win_ratios.csv')
     df = df.loc[df.Season == year, ['TeamID', 'Wins', 'Losses']]
     return df
 
 
 def get_teams_form(year=2023):
-    """Returns a DataFrame of the results of the last 5 games for each team."""
+    """
+    Returns a DataFrame of the results of the last 5 games for each team.
+    
+    Args:
+        year: Season.
+    
+    Returns:
+        Pandas DataFrame.
+    """
     df_form = pd.read_csv('./data/etl/team_form.csv').replace(np.nan, 'D', inplace=True)
     df_form = df_form.loc(df_form.Season == year, ['TeamID', 'G1', 'G2', 'G3', 'G4', 'G5'])
     return df_form
 
 
 def get_team_win_record(team, df):
-    """Get a string version of a team win record."""
+    """
+    Get a string version of a team win record.
+    
+    Args:
+        team: Team ID. Integer.
+        df: Pandas DataFrame with wins and losses in season.
+    
+    Returns:
+        String containing wins and losses.
+    """
     row = df.loc[df.TeamID == team].reset_index(drop=True).iloc[0]
     wins = row['Wins']
     losses = row['Losses']
@@ -142,12 +248,27 @@ def get_team_win_record(team, df):
 
 
 def load_test_set():
-    """Load test set."""
+    """
+    Load test set.
+    
+    Returns:
+        Pandas DataFrame with test dataset.
+    """
     return pd.read_csv('./data/etl/test_set.csv')
 
 
 def get_feature_table(test_set, features, match_id):
-    """Get table of features for match."""
+    """
+    Get table of features for match.
+
+    Args:
+        test_set: Pandas DataFrame with test features.
+        features: List of features to display.
+        match_id: Match to display.
+    
+    Returns:
+        Pandas DataFrame formatted with given features.
+    """
     
     # Get match features
     row = test_set.loc[test_set.ID == match_id].reset_index(drop=True).iloc[0]
