@@ -2,7 +2,15 @@ import pandas as pd
 
 
 def calculate_clutch_win_ratio(max_score_gap=3):
-    """Calculate the number of clutch games per team and the clutch win ratio."""
+    """
+    Calculate the number of clutch games per team and the clutch win ratio.
+    Save the DataFrame to clutch_games.csv.
+
+    Args:
+        max_score_gap: The maximum final score difference between the two
+            teams for a game to be considered a clutch game - unless the game
+            goes to overtime.
+    """
 
     # Get all results into a single dataframe
     df_results = pd.concat([
@@ -32,10 +40,12 @@ def calculate_clutch_win_ratio(max_score_gap=3):
 
     # Combine wins and losses
     df_results = pd.merge(df_wins, df_loss, how='outer', on=['Season', 'TeamID'])
-    df_results[['ClutchWins', 'ClutchLosses']] = df_results[['ClutchWins', 'ClutchLosses']].fillna(0)
+    cols = ['ClutchWins', 'ClutchLosses']
+    df_results[cols] = df_results[cols].fillna(0)
 
     # Calculate clutch ratio
-    df_results['ClutchRatio'] = df_results['ClutchWins'] / (df_results['ClutchWins'] + df_results['ClutchLosses'])
+    clutch_matches = (df_results['ClutchWins'] + df_results['ClutchLosses'])
+    df_results['ClutchRatio'] = df_results['ClutchWins'] / clutch_matches
     df_results['ClutchRatio'] = df_results['ClutchRatio'].fillna(1)
     
     # Save to file

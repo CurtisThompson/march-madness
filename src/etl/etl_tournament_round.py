@@ -4,7 +4,18 @@ import pandas as pd
 
 
 def route_to_final(df_slots, season, seed):
-    """Returns a seeds route to the final as a list of game slots."""
+    """
+    Returns a seeds route to the final as a list of game slots.
+
+    Args:
+        df_slots: Kaggle tournament slots DataFrame.
+        season: Season to compare. Integer.
+        seed: Full seed string.
+    
+    Returns:
+        List with strings of each slot met on route to final.
+    """
+
     route = []
     check_slot = seed
 
@@ -23,7 +34,20 @@ def route_to_final(df_slots, season, seed):
 
 
 def find_seed_match_up_round(df_slots, season, seed_a, seed_b):
-    """Find the earliest possible round where two seeds could meet."""
+    """
+    Find the earliest possible round where two seeds could meet.
+
+    Args:
+        df_slots: Kaggle tournament slots DataFrame.
+        season: Season to compare. Integer.
+        seed_a: Full seed string for TeamA.
+        seed_b: Full seed string for TeamB.
+    
+    Returns:
+        String representing the earliest tournament slots where two input
+        seeds will meet.
+    """
+
     # If first four, then return 0
     if seed_a[:3] == seed_b[:3]:
         return 0
@@ -44,16 +68,36 @@ def find_seed_match_up_round(df_slots, season, seed_a, seed_b):
 
 
 def find_team_seed(df_seeds, season, team):
-    """Looks up the seed of a given team in a season."""
+    """
+    Looks up the seed of a given team in a season.
+
+    Args:
+        df_seeds: Pandas DataFrame of teams, seasons, and seeds.
+        season: Season to lookup.
+        team: Team ID to lookup.
+    
+    Returns:
+        String representing the seed of the team found.
+    """
     try:
-        seed = df_seeds.loc[(df_seeds.Season == season) & (df_seeds.TeamID == team), 'Seed'].iloc[0]
+        seed = df_seeds.loc[(df_seeds.Season == season) &
+                            (df_seeds.TeamID == team), 'Seed'].iloc[0]
     except:
         seed = ''
     return seed
 
 
 def create_team_matchups_from_seedings(df_seeds, season):
-    """Lists every two-team seed combination."""
+    """
+    Lists every two-team seed combination.
+    
+    Args:
+        df_seeds: Pandas DataFrame of teams, seasons, and seeds.
+        season: Season to lookup.
+    
+    Returns:
+        Pandas DataFrame with all possible permutations of teams.
+    """
     teams = df_seeds.loc[df_seeds.Season == season, 'TeamID'].values
     match_ups = permutations(teams, 2)
     df = pd.DataFrame(match_ups, columns=['TeamA', 'TeamB'])
@@ -61,10 +105,20 @@ def create_team_matchups_from_seedings(df_seeds, season):
     return df
 
 
-def find_all_team_matchups_single_gender(df_slots, df_seeds, df_games, current_year=2023):
+def find_all_team_matchups_single_gender(df_slots, df_seeds, df_games,
+                                         current_year=2023):
     """
     Creates a look up table of all March Madness team match ups and the
     round they took place in. Only run for a single gender.
+
+    Args:
+        df_slots: Kaggle tournament slots DataFrame.
+        df_seeds: Pandas DataFrame of teams, seasons, and seeds.
+        df_games: Pandas DataFrame of all tournament games.
+        current_year: Year to calculate matchups for. Integer.
+    
+    Returns:
+        Pandas DataFrame of all possible matchups and the rounds they meet.
     """
 
     # Find matchups for current year, assuming no existing results
@@ -75,7 +129,8 @@ def find_all_team_matchups_single_gender(df_slots, df_seeds, df_games, current_y
     df_games = df_games.rename(columns={'WTeamID':'TeamA', 'LTeamID':'TeamB'})
     df_games_2 = df_games.copy()
     df_games_2[['TeamA', 'TeamB']] = df_games[['TeamB', 'TeamA']]
-    df_games = pd.concat([df_games, df_games_2, current_matchups], ignore_index=True)
+    df_games = pd.concat([df_games, df_games_2, current_matchups],
+                         ignore_index=True)
 
     # Add seeds to each team
     df_games['SeedA'] = df_games.apply(lambda x: find_team_seed(df_seeds, x.Season, x.TeamA), axis=1)
@@ -91,8 +146,11 @@ def find_all_team_matchups_single_gender(df_slots, df_seeds, df_games, current_y
 
 def find_all_team_matchups(current_year=2023):
     """
-    Creates a look up table of all March Madness team match ups and the
-    round they took place in.
+    Create a look up table of all March Madness team match ups and the
+    round they took place in. Save to tournament_rounds.csv.
+
+    Args:
+        current_year: Year to calculate matchups for. Integer.
     """
 
     # Mens match ups

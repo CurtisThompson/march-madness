@@ -2,7 +2,10 @@ import pandas as pd
 
 
 def reformat_seeds():
-    """Reformats seed file so that seeds are integers."""
+    """
+    Reformat seed file so that seeds are integers. Save to seeds.csv.
+    """
+
     df = pd.read_csv('./data/kaggle/MNCAATourneySeeds.csv')
     df = df.rename(columns={'Seed':'FullSeed'})
     df['Seed'] = df['FullSeed'].apply(lambda x: x[1:3]).astype(int)

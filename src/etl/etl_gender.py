@@ -2,7 +2,10 @@ import pandas as pd
 
 
 def find_gender():
-    """Create a table of each team ID with their gender. 1 for women, 0 for men."""
+    """
+    Create a table of each team ID with their gender. 1 for women, 0 for
+    men. Save to genders.csv.
+    """
 
     # Load womens teams
     df_w = pd.read_csv('./data/kaggle/WTeams.csv')

@@ -1,7 +1,13 @@
 import pandas as pd
 
+
 def calculate_elo(K=32):
-    """Calculate season Elo for all teams."""
+    """
+    Calculate season Elo for all teams. Save to elo_K.csv.
+    
+    Args:
+        K: The K factor for Elo calculations. Default is 32. Integer.
+    """
 
     # Import results data
     df = pd.read_csv('./data/kaggle/MRegularSeasonCompactResults.csv')
@@ -63,7 +69,8 @@ def calculate_elo(K=32):
 
     # Save Elos to file
     df_all_elos = pd.concat(df_all_elos, ignore_index=True)
-    df_all_elos.to_csv(f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv', index=False)
+    df_all_elos.to_csv(f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv',
+                       index=False)
 
 
 if __name__ == "__main__":

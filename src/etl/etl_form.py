@@ -3,7 +3,18 @@ import pandas as pd
 
 
 def get_uniform_form(results, group, last_n=10):
-    """Calculate a form value with each match taking equal weighting."""
+    """
+    Calculate a form value with each match taking equal weighting.
+    
+    Args:
+        results: Pandas DataFrame with match results.
+        group: (Season, TeamID) tuple for team to extract form.
+        last_n: Number of games to include in form calculations. Integer.
+    
+    Returns:
+        Integer value between 0 and 1 representing the win ratio in the last
+        n games.
+    """
 
     # Get results for season and team
     results = results.get_group(group).reset_index(drop=True)
@@ -19,7 +30,17 @@ def get_harmonic_form(results, group, last_n=10, similar_n=3):
     """
     Calculate a form value based on the harmonic series, where more recent
     games are more valuable.
+
+    Args:
+        results: Pandas DataFrame with match results.
+        group: (Season, TeamID) tuple for team to extract form.
+        last_n: Number of games to include in form calculations. Integer.
+        similar_n: The most recent number of games to take the same weighting.
+    
+    Returns:
+        Integer value between 0 and 1 representing the recent form of a team.
     """
+
     # Get results for season and team
     results = results.get_group(group).reset_index(drop=True)
 
@@ -47,7 +68,17 @@ def get_harmonic_form(results, group, last_n=10, similar_n=3):
 
 
 def get_game_res_from_group(df, group, game):
-    """Gets the x last game from a (Season, TeamID) group."""
+    """
+    Gets the x last game from a (Season, TeamID) group.
+    
+    Args:
+        df: A Pandas GroupBy DataFrame with results for each Season and Team.
+        group: (Season, TeamID) tuple for team to extract.
+        game: The nth last game to get results for. Integer.
+    
+    Returns:
+        String 'W' or 'L' representing result of game.
+    """
     try:
         res = df.get_group(group).iloc[-game].Result
     except:
@@ -56,7 +87,15 @@ def get_game_res_from_group(df, group, game):
 
 
 def get_teams_form(form_game_window=10, form_game_similar=3):
-    """Saves a DataFrame of the results of the last 5 games for each team per season."""
+    """
+    Save a DataFrame of the results of the last 5 games for each team per
+    season. Save to team_form.csv.
+    
+    Args:
+        form_game_window: The number of games to include in form calculation.
+        form_game_similar: The most recent number of games to take the same
+            weighting in harmonic form calculations.
+    """
 
     # Get all results
     dfm = pd.read_csv('./data/kaggle/MRegularSeasonCompactResults.csv')
@@ -68,7 +107,8 @@ def get_teams_form(form_game_window=10, form_game_similar=3):
     df2 = df.copy()
     df2[['WTeamID', 'LTeamID']] = df[['LTeamID', 'WTeamID']]
     df2['Result'] = 'L'
-    df = pd.concat([df, df2], ignore_index=True).sort_values(['Season', 'DayNum']).reset_index(drop=True)
+    df = pd.concat([df, df2], ignore_index=True)
+    df = df.sort_values(['Season', 'DayNum']).reset_index(drop=True)
 
     # Make form DataFrame
     df_form = df[['Season', 'WTeamID']].drop_duplicates()

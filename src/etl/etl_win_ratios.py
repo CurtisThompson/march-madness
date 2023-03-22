@@ -1,7 +1,10 @@
 import pandas as pd
 
+
 def save_win_ratios():
-    """Calculate season win ratios from compact results."""
+    """
+    Calculate season win ratios from compact results. Save to win_ratios.csv.
+    """
     
     # Get all results into a single dataframe
     df_results = pd.concat([
@@ -9,23 +12,27 @@ def save_win_ratios():
         pd.read_csv('./data/kaggle/WRegularSeasonCompactResults.csv')
     ], ignore_index=True)
 
+    # Get groups for winners and losers
+    win_group = df_results.groupby(['Season', 'WTeamID'])
+    lose_group = df_results.groupby(['Season', 'LTeamID'])
+
     # Get wins by each team per season
-    df_wins = df_results.groupby(['Season', 'WTeamID']).count().reset_index()
+    df_wins = win_group.count().reset_index()
     df_wins = df_wins[['Season', 'WTeamID', 'DayNum']]
     df_wins = df_wins.rename(columns={'WTeamID':'TeamID', 'DayNum':'Wins'})
 
     # Get losses by each team per season
-    df_loss = df_results.groupby(['Season', 'LTeamID']).count().reset_index()
+    df_loss = lose_group.count().reset_index()
     df_loss = df_loss[['Season', 'LTeamID', 'DayNum']]
     df_loss = df_loss.rename(columns={'LTeamID':'TeamID', 'DayNum':'Losses'})
 
     # Get points scored
-    df_wpts = df_results.groupby(['Season', 'WTeamID']).sum(numeric_only=True).reset_index()
+    df_wpts = win_group.sum(numeric_only=True).reset_index()
     df_wpts = df_wpts[['Season', 'WTeamID', 'WScore']]
     df_wpts = df_wpts.rename(columns={'WTeamID':'TeamID', 'WScore':'PtsFor'})
 
     # Get points against
-    df_lpts = df_results.groupby(['Season', 'LTeamID']).sum(numeric_only=True).reset_index()
+    df_lpts = lose_group.sum(numeric_only=True).reset_index()
     df_lpts = df_lpts[['Season', 'LTeamID', 'LScore']]
     df_lpts = df_lpts.rename(columns={'LTeamID':'TeamID', 'LScore':'PtsAgainst'})
 

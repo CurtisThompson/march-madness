@@ -2,8 +2,20 @@ import pandas as pd
 
 
 def merge_team_features(df, file_path, columns, nan_value=0):
-    """Combines a feature file with the training set twice, once for each team
-       to add their features."""
+    """
+    Combines a feature file with the training set twice, once for each team
+    to add their features.
+    
+    Args:
+        df: Existing features DataFrame.
+        file_path: File path of ETL features to add.
+        columns: List of ETL features to add.
+        nan_value: Value to replace NaN values with Default is 0.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
+    
     # Load in file and get correct columns
     file = pd.read_csv(file_path)
     file = file[['Season', 'TeamID'] + columns]
@@ -11,13 +23,21 @@ def merge_team_features(df, file_path, columns, nan_value=0):
     # Merge for team A
     cols_a = [str(x)+'A' for x in columns]
     conv_dict = dict(zip(columns, cols_a))
-    df = pd.merge(df, file, how='left', left_on=['Season', 'TeamA'], right_on=['Season', 'TeamID'])
+    df = pd.merge(df,
+                  file,
+                  how='left',
+                  left_on=['Season', 'TeamA'],
+                  right_on=['Season', 'TeamID'])
     df = df.rename(columns=conv_dict).drop('TeamID', axis=1)
 
     # Merge for team B
     cols_b = [str(x)+'B' for x in columns]
     conv_dict = dict(zip(columns, cols_b))
-    df = pd.merge(df, file, how='left', left_on=['Season', 'TeamB'], right_on=['Season', 'TeamID'])
+    df = pd.merge(df,
+                  file,
+                  how='left',
+                  left_on=['Season', 'TeamB'],
+                  right_on=['Season', 'TeamID'])
     df = df.rename(columns=conv_dict).drop('TeamID', axis=1)
 
     # Fill NaN
@@ -28,7 +48,15 @@ def merge_team_features(df, file_path, columns, nan_value=0):
 
 
 def add_win_ratio(df):
-    """Merge win ratio and pts ratio into DataFrame."""
+    """
+    Merge win ratio and pts ratio into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              './data/etl/win_ratios.csv',
                              ['WinRatio', 'PtsForRatio'],
@@ -37,7 +65,15 @@ def add_win_ratio(df):
 
 
 def add_massey(df):
-    """Merge massey ranking stats into DataFrame."""
+    """
+    Merge massey ranking stats into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              './data/etl/massey.csv',
                              ['MasseyMedian', 'MasseyMean', 'MasseyStd'],
@@ -48,7 +84,15 @@ def add_massey(df):
 
 
 def add_form(df):
-    """Merge form values into DataFrame."""
+    """
+    Merge form values into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              './data/etl/team_form.csv',
                              ['FormHarmonic', 'FormUniform'],
@@ -57,7 +101,15 @@ def add_form(df):
 
 
 def add_538_ratings(df):
-    """Merge 538 ratings into DataFrame."""
+    """
+    Merge 538 ratings into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              './data/etl/538_ratings.csv',
                              ['Rating'],
@@ -67,7 +119,15 @@ def add_538_ratings(df):
 
 
 def add_tournament_round(df):
-    """Merge tournament rounds into DataFrame."""
+    """
+    Merge tournament rounds into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     ratings = pd.read_csv('./data/etl/tournament_rounds.csv')
     df = pd.merge(df,
                   ratings,
@@ -79,7 +139,15 @@ def add_tournament_round(df):
 
 
 def add_seeds(df):
-    """Merge tournament seeds into DataFrame."""
+    """
+    Merge tournament seeds into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              './data/etl/seeds.csv',
                              ['Seed'],
@@ -89,7 +157,16 @@ def add_seeds(df):
 
 
 def add_elo(df, K=32):
-    """Merge Elo ratings into DataFrame."""
+    """
+    Merge Elo ratings into DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+        K: K Factor used in Elo calculations. Integer.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              f'./data/etl/elo{"_"+str(K) if K != 32 else ""}.csv',
                              ['Elo'],
@@ -101,7 +178,15 @@ def add_elo(df, K=32):
 
 
 def add_gender(df):
-    """Merge gender feature with DataFrame."""
+    """
+    Merge gender feature with DataFrame.
+    
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df_gender = pd.read_csv('./data/etl/genders.csv')
     df_gender = df_gender.rename(columns={'TeamID' : 'TeamA'})
     df = pd.merge(df, df_gender, how='left', on='TeamA')
@@ -110,7 +195,15 @@ def add_gender(df):
 
 
 def add_clutch(df):
-    """Merge clutch game features with DataFrame."""
+    """
+    Merge clutch game features with DataFrame.
+
+    Args:
+        df: Existing features DataFrame.
+    
+    Returns:
+        Combined Pandas DataFrame with new features.
+    """
     df = merge_team_features(df,
                              './data/etl/clutch_games.csv',
                              ['ClutchRatio'],
@@ -119,7 +212,17 @@ def add_clutch(df):
 
 
 def build_training_set(elo_K=32, mens_start_year=1985, womens_start_year=1985):
-    """Calculate all features for training dataset and save to file."""
+    """
+    Calculate all features for training dataset and save to file.
+
+    Args:
+        elo_K: K Factor used in Elo calculations. Integer.
+        mens_start_year: First year to include mens training data.
+        womens_start_year: First year to include womens training data.
+    
+    Returns:
+        Pandas DataFrame for test set with all loaded features.
+    """
 
     # Load mens tourney results
     df_men = pd.read_csv('./data/kaggle/MNCAATourneyCompactResults.csv')
@@ -167,7 +270,12 @@ def build_training_set(elo_K=32, mens_start_year=1985, womens_start_year=1985):
 
 
 def prep_submission_frame():
-    """Load in template prediction frame."""
+    """
+    Load in template prediction frame.
+
+    Returns:
+        Pandas DataFrame with all test games to predict.
+    """
     df_template = pd.read_csv('./data/kaggle/SampleSubmission2023.csv')
 
     # Split ID into values
@@ -179,7 +287,15 @@ def prep_submission_frame():
 
 
 def build_test_set(elo_K=32):
-    """Calculate all features for test dataset and save to file."""
+    """
+    Calculate all features for test dataset and save to file.
+    
+    Args:
+        elo_K: K Factor used in Elo calculations. Integer.
+    
+    Returns:
+        Pandas DataFrame for test set with all loaded features.
+    """
 
     # Load template for current season
     df = prep_submission_frame()
