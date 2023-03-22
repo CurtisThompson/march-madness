@@ -4,7 +4,13 @@ import os
 
 
 def download(comp='march-machine-learning-mania-2023'):
-    """Downloads competition files from Kaggle."""
+    """
+    Downloads competition files from Kaggle, and saves to file.
+    
+    Args:
+        comp: Name of the Kaggle competition to download files for. String.
+    """
+    
     d_path = './data/kaggle/'
 
     # Authenticate through API
