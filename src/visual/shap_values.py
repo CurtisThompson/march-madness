@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from xgboost import XGBClassifier
+from joblib import load
 
 
 MODEL_COLS = ['SeedDiff', 'EloWinProbA', 'WinRatioA', 'WinRatioB', 'ClutchRatioA', 'ClutchRatioB']
@@ -34,10 +34,8 @@ def load_models(name='default_model'):
     Returns:
         Mens model and womens model.
     """
-    men_model = XGBClassifier()
-    men_model.load_model(f'./data/models/{name}_men.mdl')
-    women_model = XGBClassifier()
-    women_model.load_model(f'./data/models/{name}_women.mdl')
+    men_model = load(f'./data/models/{name}_men.mdl')
+    women_model = load(f'./data/models/{name}_women.mdl')
     return men_model, women_model
 
 

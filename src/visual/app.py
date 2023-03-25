@@ -3,7 +3,7 @@ import os
 from dash import Dash, dcc, html, no_update, dash_table
 from dash.dependencies import Input, Output
 
-import app_utils
+from src.visual import app_utils
 
 
 # Datasets
@@ -167,8 +167,8 @@ def update_team_forms(gender, teama, teamb):
     
     # Get home and away team, and forms
     match_id, home_team, away_team = app_utils.get_match_id(2023, teama, teamb)
-    home_form = team_forms.loc[team_forms.Team == home_team].reset_index(drop=True).iloc[0]
-    away_form = team_forms.loc[team_forms.Team == away_team].reset_index(drop=True).iloc[0]
+    home_form = team_forms.loc[team_forms.TeamID == home_team].reset_index(drop=True).iloc[0]
+    away_form = team_forms.loc[team_forms.TeamID == away_team].reset_index(drop=True).iloc[0]
     
     # Function to get CSS form class
     form_class = lambda x: 'team-form-win' if x == 'W' else 'team-form-loss'

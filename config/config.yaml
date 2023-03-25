@@ -3,13 +3,13 @@ current_year: 2023
 
 run_component:
   ingestion: False
-  etl: False
+  etl: True
   etl_elo: False
-  training: False
-  tuning: False
-  prediction: False
-  submit_prediction: True
-  importance: False
+  training: True
+  tuning: True
+  prediction: True
+  submit_prediction: False
+  importance: True
   run_server: False
 
 etl:
@@ -55,8 +55,8 @@ model:
     - Round
     - PtsForRatioA
     - PtsForRatioB
-  optimisation_iterations: 50
-  optimisation_initial: 10
+  optimisation_iterations: 10
+  optimisation_initial: 2
   calibrate: False
   calibration_size: 0.2
 

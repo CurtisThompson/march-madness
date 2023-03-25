@@ -225,8 +225,8 @@ def get_teams_form(year=2023):
     Returns:
         Pandas DataFrame.
     """
-    df_form = pd.read_csv('./data/etl/team_form.csv').replace(np.nan, 'D', inplace=True)
-    df_form = df_form.loc(df_form.Season == year, ['TeamID', 'G1', 'G2', 'G3', 'G4', 'G5'])
+    df_form = pd.read_csv('./data/etl/team_form.csv').replace(np.nan, 'D')
+    df_form = df_form.loc[df_form.Season == year, ['TeamID', 'G1', 'G2', 'G3', 'G4', 'G5']]
     return df_form
 
 
