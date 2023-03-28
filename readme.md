@@ -9,22 +9,38 @@ March Madness is the annual Division I college basketball tournament in the Unit
 
 March Madness is one of the largest annual sporting events in America and tens of millions of Americans take part in bracket pool contests, attempting to predict the outcome of every game in the tournament.
 
-## Set-Up
+## Set Up
 
 1. Create the Python environment by running the following command:
 ```
 conda env create --name march-madness-2023 --file ./env/environment.yaml
 ```
-If you have already created the environment and need to update it, run the following command:
-```
-conda env update --name march-madness-2023 --file ./env/environment.yaml
-```
-
-> :warning: **If conda takes a long time to solve the environment: This is an occassional issue with conda. If conda takes more than 15 minutes to solve the environment then it is recommended to update the conda solver by following the instructions from the [Anaconda blog](https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community).**
-
 
 2. Download API keys for Kaggle (required to ingest some datasets) . Follow the [instructions on the Kaggle website](https://www.kaggle.com/docs/api#getting-started-installation-&-authentication).
 
-
 3. Run the ```./run_pipeline.py``` Python file.  
 This script will build your data directory structure, download and process all datasets, and build a complete model.
+
+See the [Project Set Up page](https://github.com/CurtisThompson/march-madness/wiki/Project-Set-Up) on the Wiki for more details.
+
+## Pipeline
+
+The pipeline ingests data from two sources; Kaggle and Five Thirty Eight. This data is then processed and converted into a training and test set. The training set is used to train multiple machine learning models, and then current tournament predictions are made with the test set. These predictions can be submitted back to a Kaggle competition or viewed on a local dashboard.
+
+The basic flow of the pipeline is given below.
+
+![Flow_2023](https://user-images.githubusercontent.com/16989865/228359984-42a90142-7c5a-43be-96fc-522965cbdef2.png)
+
+See the [Pipeline Processes page](https://github.com/CurtisThompson/march-madness/wiki/Process) on the Wiki for more details.
+
+## Dashboard
+
+After running the main pipeline, it is possible to run a Dash dashboard on a local server (i.e. localhost). This is achievable with the run_component/run_server parameter in the config file.
+
+The dashboard displays model predictions to the user alongside key feature values and SHAP values. See the image below for a basic example.
+
+![dashboard](https://user-images.githubusercontent.com/16989865/228363926-4197ce63-de7b-46ad-a677-0897c800119d.png)
+
+## Wiki
+
+[The Wiki](https://github.com/CurtisThompson/march-madness/wiki) is the main source of information on this project. It has pages that explain each main source code module, each main data science technique used, and background information. Please check out the Wiki first if unsure about any part of the project.
