@@ -1,4 +1,4 @@
-# March Madness 2023
+# March Madness
 
 This project aims to predict the outcome of every game in the March Madness basketball tournament.
 
@@ -18,8 +18,7 @@ conda env create --name march-madness-2023 --file ./env/environment.yaml
 
 2. Download API keys for Kaggle (required to ingest some datasets) . Follow the [instructions on the Kaggle website](https://www.kaggle.com/docs/api#getting-started-installation-&-authentication).
 
-3. Run the ```./run_pipeline.py``` Python file.  
-This script will build your data directory structure, download and process all datasets, and build a complete model.
+3. Run the ```./run_pipeline.py``` Python file.
 
 See the [Project Set Up page](https://github.com/CurtisThompson/march-madness/wiki/Project-Set-Up) on the Wiki for more details.
 
