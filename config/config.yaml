@@ -1,15 +1,16 @@
 random_state: 0
-current_year: 2023
+current_year: 2024
 
 run_component:
   ingestion: False
-  etl: True
+  etl: False
   etl_elo: False
-  training: True
-  tuning: True
+  training: False
+  tuning: False
   prediction: True
+  bracketise: True
   submit_prediction: False
-  importance: True
+  importance: False
   run_server: False
 
 etl:
@@ -60,7 +61,11 @@ model:
   calibrate: False
   calibration_size: 0.2
 
+predict:
+  win_style: Prob
+  num_brackets: 5
+
 kaggle:
-  competition: march-machine-learning-mania-2023
+  competition: march-machine-learning-mania-2024
   submit_message: Test API Submission
   include_metric_in_message: False

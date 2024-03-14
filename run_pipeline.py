@@ -18,6 +18,7 @@ from src.etl.etl_massey import calculate_massey
 
 from src.model.evaluate import validate_and_build_model
 from src.model.predict import run as predict_current_year
+from src.model.bracketise import run as bracketise_predictions
 
 from src.submission.kaggle_submission import submit as competition_submit
 
@@ -82,6 +83,11 @@ def run(CONFIG):
     if CONFIG['run_component']['prediction']:
         predict_current_year(model_columns_men=CONFIG['model']['mens_columns'],
                              model_columns_women=CONFIG['model']['womens_columns'])
+    
+    # Bracketise Predictions
+    if CONFIG['run_component']['bracketise']:
+        bracketise_predictions(num_brackets=CONFIG['predict']['num_brackets'],
+                               win_style=CONFIG['predict']['win_style'])
 
     # Submit Predictions To Competition
     if CONFIG['run_component']['submit_prediction']:

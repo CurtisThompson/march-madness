@@ -269,7 +269,7 @@ def build_training_set(elo_K=32, mens_start_year=1985, womens_start_year=1985):
     df.to_csv('./data/etl/training_set.csv', index=False)
 
 
-def prep_submission_frame():
+def prep_submission_frame_2023():
     """
     Load in template prediction frame.
 
@@ -284,6 +284,30 @@ def prep_submission_frame():
     df_template['TeamB'] = df_template['ID'].apply(lambda x: x.split('_')[2]).astype(int)
 
     return df_template
+
+
+def prep_submission_frame():
+    """
+    Build the submission frame.
+
+    Returns:
+        Pandas DataFrame with all test games to predict.
+    """
+    df = pd.read_csv('./data/kaggle/2024_tourney_seeds.csv')
+
+    # Get a list of teams
+    w_teams = df.loc[df.Tournament == 'W', 'TeamID'].values
+    m_teams = df.loc[df.Tournament == 'M', 'TeamID'].values
+    w_teams_comb = [[i, j] for i in w_teams for j in w_teams if i < j]
+    m_teams_comb = [[i, j] for i in m_teams for j in m_teams if i < j]
+    teams = w_teams_comb + m_teams_comb
+
+    # Build dataset to predict on
+    df = pd.DataFrame(teams, columns=['TeamA', 'TeamB'])
+    df['Season'] = 2024
+    df['ID'] = df.Season.astype(str) + '_' + df.TeamA.astype(str) + '_' + df.TeamB.astype(str)
+
+    return df
 
 
 def build_test_set(elo_K=32):

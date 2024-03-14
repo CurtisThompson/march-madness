@@ -63,7 +63,7 @@ def build_model(training_data, training_columns=TRAINING_COLS, params={},
 
 
 def cross_validate_model(training_data, training_columns=TRAINING_COLS,
-                         start_year=2017, end_year=2022, verbose=True, params={},
+                         start_year=2017, end_year=2023, verbose=True, params={},
                          calibrate=False, random_state=0, calibrator_size=0.2):
     """
     Cross validate model by building a new model per year.
