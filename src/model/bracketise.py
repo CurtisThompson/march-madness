@@ -7,12 +7,35 @@ import numpy as np
 
 
 def get_seed_matchup(df, seed_a, seed_b, tournament):
+    """
+    Args:
+        df: DataFrame of win probabilities between all teams.
+        seed_a: Team seed.
+        seed_b: Team seed.
+        tournament: Men or women tournament.
+    
+    Returns:
+        Win probability for seed a.
+    """
     vals = df.loc[((df.SeedA==seed_a) & (df.SeedB==seed_b) & (df.Tournament == tournament)), 'Pred'].values
     vals_b = 1 - df.loc[((df.SeedA==seed_b) & (df.SeedB==seed_a) & (df.Tournament == tournament)), 'Pred'].values
     return (list(vals) + list(vals_b))[0]
 
 
 def get_winner(df, seed_a, seed_b, tournament, win_style='Best'):
+    """
+    Get predicted winner of a seed match-up.
+
+    Args:
+        df: DataFrame of win probabilities between all teams.
+        seed_a: Team seed.
+        seed_b: Team seed.
+        tournament: Men or women tournament.
+        win_style: 'Best' always selects winner, 'Prob' uses probabilities.
+
+    Returns:
+        Seed of predicted winner.
+    """
     # Find win probability
     score = get_seed_matchup(df, seed_a, seed_b, tournament)
 
@@ -29,10 +52,33 @@ def get_winner(df, seed_a, seed_b, tournament, win_style='Best'):
 
 
 def find_slot_winner(df, slot, tournament):
+    """
+    Get slot winner of match.
+
+    Args:
+        df: DataFrame of round matches with assigned winners.
+        slot: Current round slot.
+        tournament: Men or women tournament.
+    
+    Returns:
+        Slot of winner of match.
+    """
     return df.loc[(df.Slot == slot) & (df.Tournament == tournament), 'Team'].values[0]
 
 
 def calculate_round(df, round, df_matchup, win_style='Best'):
+    """
+    Creates bracket-style DataFrame of predicted winners in round of tournament.
+
+    Args:
+        df: DataFrame of round matches.
+        round: Numerical round of tournament.
+        df_matchup: DataFrame of win probabilities between all teams.
+        win_style: 'Best' always selects winner, 'Prob' uses probabilities.
+    
+    Returns:
+        DataFrame of round winners.
+    """
     # Fill in winners of previous round
     if round > 1:
         df.loc[df.Round == round, 'StrongSeed'] = df.loc[df.Round == round].apply(lambda x: find_slot_winner(df, x.StrongSeed, x.Tournament), axis=1)
@@ -51,6 +97,18 @@ def run(file_path='./data/predictions/', file_name='bracket',
         slot_file='./data/kaggle/MNCAATourneySlots.csv',
         year=2023, num_brackets=1, win_style='Best'):
     """
+    Converts existing predictions into a bracket-style result as needed for
+    2024 competition.
+
+    Args:
+        file_path: Directory to save bracket to.
+        file_name: Name to give to saved bracket CSV file (without extension).
+        pred_file: File path containing all match predictions.
+        seed_file: File path containing seeds for upcoming tournament.
+        slot_file: File path containing tournament slots.
+        year: Year making predictions for.
+        num_brackets: Number of brackets to create.
+        win_style: 'Best' always selects winner, 'Prob' uses probabilities.
     """
     # Load prediction file
     df = pd.read_csv(pred_file)
